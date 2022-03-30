@@ -11,7 +11,42 @@ class InfiniteLoop(Exception):
     __slots__ = ()
 
 
+class CachedParse:
+
+    def __init__(self, generator, initial_context):
+        self.generator = iter(generator)
+        self.initial_context = initial_context
+        self.cache = []
+
+    def run(self, context):
+        for output, modifications in self.cache:
+            yield output, merge(context, modifications)
+        i = len(self.cache)
+        for parse in self.generator:
+            # what if this parse was taken
+            # from this very generator?
+            for output, modifications in self.cache[i:]:
+                yield output, merge(context, modifications)
+            output, context = parse
+            cache_entry = (output, diff(context, self.initial_context))
+            self.cache.append(cache_entry)
+            i += 1
+            yield parse
+        for output, modifications in self.cache[i:]:
+            yield output, merge(context, modifications)
+
+class HashDict(dict):
+    def __hash__(self):
+        return id(self)
+
 def diff(new, initial):
+    """Record updates and deletions between initial and new maps
+
+    Args:
+        new (HAMT): Map object
+        initial (HAMT): Map object
+    Returns:
+        tuple: insertions (HAMT) and keys deleted (frozenset)"""
     deleted = frozenset(initial.keys()) - frozenset(new.keys())
     for key, value in new.items():
         try:
@@ -24,6 +59,13 @@ def diff(new, initial):
 
 
 def merge(context, modifications):
+    """Merge updates and deletions between initial and new maps
+
+    Args:
+        context (HAMT): Map object
+        modifications (tuple): insertions and keys deleted
+    Returns:
+        HAMT: context with specified insertions (HAMT) and deletions (frozenset)"""
     additions, deletions = modifications
     for deletion in deletions:
         context = context.delete(deletion)
@@ -314,24 +356,22 @@ class Transpiler:
     def recur(self, f):
         """Build a new transpiler from the result of recursively applying a
         function to all the transpilers that comprise this one."""
-        new = self._recur(f)
-        transformations = {}
-        new.visit(find_transformations(transformations))
-        new.visit(update_links(transformations))
+        transformations = HashDict({})
+        new = self._recur(f, transformations)
+        update_links(transformations)
         reset(new)
         return new
 
     @_lru_cache(None)
-    def _recur(self, f):
+    def _recur(self, f, transformations):
         """Build a new transpiler from the result of recursively applying a
         function to all the transpilers that comprise this one. Rather than
         fixing broken references, just track which transpilers the resulting
-        transpilers were derived from by setting the new transpiler's ``prev``
-        attribute to ``self``. Subsequent passes in ``recur`` gather these
-        transformations and use them to fix broken links."""
+        transpilers were derived from in the dict argument. Subsequent passes
+        in ``recur`` use this map to fix broken links."""
 
         new = f(self.copy())
-        new.prev = self
+        transformations[self] = new
         return new
 
     @_lru_cache(None)
@@ -345,23 +385,21 @@ def stitch(lookup):
     """Stitch transpilers by reference, replacing Placeholders with Links.
 
     Args:
-        lookup: hamt from placeholder identifiers to parsers
+        lookup (dict): map from placeholder identifiers to parsers
 
     Returns:
-        hamt from placeholder identifiers to properly linked parsers"""
+        dict: map from placeholder identifiers to properly linked parsers"""
     link_lookup = {key: Link(value) for key, value in lookup.items()}
+    transformations = HashDict({})
     # similar sequence to recur
     lookup = {
         key: value._recur(
-            typed({Placeholder: lambda t: link_lookup.get(t.identifier, t)})
+            typed({Placeholder: lambda t: link_lookup.get(t.identifier, t)}),
+            transformations,
         )
         for key, value in lookup.items()
     }
-    transformations = {}
-    for value in lookup.values():
-        value.visit(find_transformations(transformations))
-    for value in lookup.values():
-        value.visit(update_links(transformations))
+    update_links(transformations)
     # but link's parser needs to be reset
     # because of self reference
     for key, link in link_lookup.items():
@@ -372,23 +410,11 @@ def stitch(lookup):
     return lookup
 
 
-def find_transformations(transformations):
-    def visitor(t):
-        transformations[t.prev] = t
-
-    return visitor
-
-
 def update_links(transformations):
-    def visitor(t):
-        old_link = t.prev
-        if not isinstance(old_link, Link):
-            return
-        old_parser = old_link.parser
-        new_parser = transformations[old_parser]
-        t.set_parser(new_parser)
-
-    return typed({Link: visitor})
+    for prev, new in transformations.items():
+        if not isinstance(prev, Link):
+            continue
+        new.set_parser(transformations[prev.parser])
 
 
 def clear_visit_cache(t):
@@ -478,49 +504,13 @@ class Cached(Transpiler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.cache = {}
-        self.generators = {}
 
     def __call__(self, context):
         """Parse, cache, yield, gaurd for infinite loops."""
-        parses = self.process(context)
         cache_key = apply_mask(context, self.read_context)
         if cache_key not in self.cache:
-            self.cache[cache_key] = None
-            return self.cache_process(parses, cache_key, context)
-        elif self.cache[cache_key] is None:
-            raise InfiniteLoop
-        return self.return_cache(cache_key, context)
-
-    def cache_process(self, parses, cache_key, initial_context):
-        """Iterate over parses, caching them before yielding"""
-
-        def caching_generator():
-            for parse in parses:
-                output, context = parse
-                if self.cache[cache_key] is None:
-                    self.cache[cache_key] = []
-                self.cache[cache_key].append(
-                    (output, diff(context, initial_context)))
-                yield parse
-
-        generator = caching_generator()
-        self.generators[cache_key] = generator
-        try:
-            yield from generator
-        except InfiniteLoop:
-            del self.cache[cache_key]
-            del self.generators[cache_key]
-            raise
-        if self.cache[cache_key] is None:
-            self.cache[cache_key] = []
-
-    def return_cache(self, cache_key, context):
-        for output, modifications in self.cache[cache_key]:
-            yield output, merge(context, modifications)
-        try:
-            yield from self.generators[cache_key]
-        except ValueError:
-            pass
+            self.cache[cache_key] = CachedParse(self.process(context), context)
+        return self.cache[cache_key].run(context)
 
 
 class Template(Transpiler):
@@ -628,9 +618,9 @@ class Wrapper(Transpiler):
         return self.parser(key)
 
     @_lru_cache(None)
-    def _recur(self, f):
-        new = f(self.copy(self.parser._recur(f)))
-        new.prev = self
+    def _recur(self, f, transformations):
+        new = f(self.copy(self.parser._recur(f, transformations)))
+        transformations[self] = new
         return new
 
     @_lru_cache(None)
@@ -742,9 +732,16 @@ class Combinator(Cached):
         self.read_context = self.left.read_context | self.right.read_context
 
     @_lru_cache(None)
-    def _recur(self, f):
-        new = f(self.copy((self.left._recur(f), self.right._recur(f))))
-        new.prev = self
+    def _recur(self, f, transformations):
+        new = f(
+            self.copy(
+                (
+                    self.left._recur(f, transformations),
+                    self.right._recur(f, transformations),
+                )
+            )
+        )
+        transformations[self] = new
         return new
 
     @_lru_cache(None)
@@ -762,13 +759,18 @@ class Alteration(Combinator):
         infiniteloop = False
         try:
             yield from self.left(context)
-        except InfiniteLoop:
+        except ValueError:
             infiniteloop = True
-        yield from self.right(context)
+        L = list(self.right(context))
+        yield from L
+        print(L)
         if infiniteloop:
+            print('switch')
             try:
-                yield from self.left(context)
-            except InfiniteLoop:
+                L = list(self.left(context))
+                print(L)
+                yield from L
+            except ValueError:
                 return
 
 
@@ -875,9 +877,9 @@ class Link(Wrapper):
         self.args[0] = parser
 
     @_lru_cache(None)
-    def _recur(self, f):
+    def _recur(self, f, transformations):
         new = f(self.copy())
-        new.prev = self
+        transformations[self] = new
         return new
 
     @_lru_cache(None)

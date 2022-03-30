@@ -2,6 +2,19 @@ from immutables import Map
 import tlang
 
 
+def test_optional():
+    a = tlang.Terminal("a") + ~tlang.Terminal("b")
+    opt = ~a
+    rule = opt + a
+    print(list(tlang.decache(rule).run()))
+    print(list(rule.run()))
+    print(tlang.decache(rule))
+    print(list(a.run()))
+    print(list(opt.run()))
+    assert list((tlang.decache(rule)).run("ab")) == ["ab"]
+    assert list((rule).run("ab")) == ["ab"]
+
+
 def test_named_alt():
     content = tlang.Terminal("a").ref("content")
     rule = "(" + content + ")"
