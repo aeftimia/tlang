@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Introduction &mdash; tlang 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="core" href="core.html" />
+    <link rel="prev" title="Tgen" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> tlang
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#terminals">Terminals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#combinators">Combinators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#templates-and-references">Templates and References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recursion">Recursion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#macros">Macros</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#static-analysis">Static Analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#cache-sharing">Cache Sharing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-custom-one-offs">Creating Custom One-Offs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#generative-mode">Generative Mode</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="core.html">core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tlang</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>Introduction</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/introduction.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="introduction">
+<h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h1>
+<p>Tlang is a DSL designed to make writing readable mainainable transpilers less
+impossible. Tlang is similar in spirit to <a class="reference external" href="https://github.com/harc/ohm">Ohm</a>,
+however Tlang differs in its goals and implementation.</p>
+<p>Tlang approaches building transpilers as an extension of context sensitive
+parsing by allowing parsers to compose. The underlying parser is probably best
+described as a scannerless context sensitive packrat parser that handles left
+recursion and ambiguity. Rather than returning one parse, parsers return
+generators. Alterations catch an <code class="xref py py-class docutils literal notranslate"><span class="pre">InfiniteLoop</span></code> exception and reverse
+the order of their branches accordingly. The parser essentially reduces to a
+packrat parser for PEG grammars.</p>
+<p>Tlang defines a parser as a map from a context object (in our case a <a class="reference external" href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">Hash
+Array Mapped Trie</a>) to
+a generator of tuples containing an output string and a new context object.
+Tlang currently powers its context objects using <a class="reference external" href="https://github.com/MagicStack/immutables">MagicStack’s immutables.Map</a>. We hope to customize this
+implementation in future releases. The input string is an entry in the context
+stored under the empty string <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code>. Static analysis is used to determine the
+subtrie of the context read by each parser, and only that subset is stored as a
+lookup key for cached parses. Furthermore, only the output string and changes
+to the context are stored under this key. This maximizes cache hits when
+irrelevant aspects of the context have changed while maintaining asymptotic
+performance.</p>
+<p>Recognizing the immense variety of possible operators needed in production
+environments, Tlang aims to be a minimal framework that makes it
+straightforward to define new parsers and operations that integrate nicely with
+its core constructs.</p>
+<section id="quickstart">
+<h2>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h2>
+<p>I get it. You don’t want to read a manual about something you’re not sure you
+care about. I’m assuming you’re interested in quickly building something that
+can manipulate code in complex ways. Here’s an example of a script that will
+change <code class="docutils literal notranslate"><span class="pre">lambda</span></code> s to <code class="docutils literal notranslate"><span class="pre">def</span></code> s (multiple args, no keyward arguments, no
+escaping newlines) while formatting whitespace.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">whitespace</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Greedy</span><span class="p">(</span><span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">))</span>
+<span class="n">trim_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+<span class="n">delete_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">variable</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">letter</span> <span class="o">+</span> <span class="p">(</span><span class="n">tlang</span><span class="o">.</span><span class="n">alphanum</span> <span class="o">|</span> <span class="s2">&quot;_&quot;</span><span class="p">)[:]</span>
+<span class="n">definition</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">whitespace</span> <span class="o">+</span> <span class="s2">&quot;=&quot;</span> <span class="o">+</span> <span class="n">whitespace</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">delimeted</span><span class="p">(</span><span class="n">variable</span><span class="p">,</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span><span class="p">)</span>
+<span class="n">definition</span> <span class="o">+=</span> <span class="s2">&quot;lambda&quot;</span> <span class="o">+</span> <span class="n">whitespace</span> <span class="o">+</span> <span class="n">args</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s2">&quot;args&quot;</span><span class="p">)</span>
+<span class="n">content</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">inv</span><span class="p">()[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="n">definition</span> <span class="o">+=</span> <span class="n">whitespace</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">whitespace</span> <span class="o">+</span> <span class="n">content</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s2">&quot;content&quot;</span><span class="p">)</span>
+<span class="n">definition</span> <span class="o">*=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s2">&quot;def </span><span class="si">{name}</span><span class="s2">(</span><span class="si">{args}</span><span class="s2">):</span><span class="se">\n</span><span class="s2">  return </span><span class="si">{content}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">definition</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;add  =   lambda   x ,  y :     x + y&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;def add(x, y):\n  return x + y&#39;]
+</pre></div>
+</div>
+</section>
+<section id="terminals">
+<h2>Terminals<a class="headerlink" href="#terminals" title="Permalink to this headline"></a></h2>
+<p>Transpilers created with Tlang are designed to ingest context objects and
+return a generator of tuples containing output strings and new context objects.
+The context object stores the input string under the <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> key. The input
+string is generally your source code, and output strings are one or more new
+versions of your code. Like writing a <a class="reference external" href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form">BNF</a> spec, Tlang allows
+you to specify terminals, and combine rules with alterations and
+concatenations.</p>
+<p>Let’s start with a simple example.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select * from table&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table select *&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;select&#39;]
+[]
+[]
+</pre></div>
+</div>
+<p>There is a subtly however. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code> only returns <em>complete</em> parses that
+transform the entire input string. Under the hood, <code class="docutils literal notranslate"><span class="pre">select</span></code> actually matches
+the string <code class="docutils literal notranslate"><span class="pre">&quot;select&quot;</span></code> from the beginning of its input. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code>
+just eliminates transforms that haven’t been applied to the entire string. You
+can see this by calling it.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+<span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39;&#39;}))]
+[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39; * from table&#39;}))]
+[]
+</pre></div>
+</div>
+<p>While defining input inthis way is admittedly clunky, it greatly streamlines
+static analysis.  We can see the terminal “ingested” the leading <code class="docutils literal notranslate"><span class="pre">&quot;select&quot;</span></code>
+from any input strings that started with it. That is, it removed the matched
+string from the beginning of the input, and returned it as output.  More
+generally, all Tlang transpilers ingest a context object, and return a
+generator of tuples containing an output string and a new context object.</p>
+</section>
+<section id="combinators">
+<h2>Combinators<a class="headerlink" href="#combinators" title="Permalink to this headline"></a></h2>
+<p>Like rules in a BNF spec, Tlang transpilers can be applied sequentially with
+concatenations or combined as a series of alternatives with alterations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot; * from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">select</span> <span class="o">+</span> <span class="n">from_stuff</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select * from table&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table select *&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+[&#39;select * from table&#39;]
+[]
+</pre></div>
+</div>
+<p>Concatenations combine two transpilers by exectuting them sequentially left to
+right. That is, the second transpiler is applied to the new input strings
+generated by the first transpiler. The output string of the second transpiler is
+appended to the output of the first.</p>
+<p>There are generally cases in which we want to combine two transpilers into a
+new transpiler that returns both outputs of the originals. Since the original
+transpilers return generators, this new combinator can be thought of as an “or”
+statement, and just chains the generators returned by its children together.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+<span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39;&#39;}))]
+[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39; * from table&#39;}))]
+[]
+</pre></div>
+</div>
+<p>Tlang uses list comprehension syntax for repetition. The start index specifies
+the minimum number of repetitions, the end index specifies the maximum number
+of repetitions, and the step size specifies the same.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)[:]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;aaaaa&#39;</span><span class="p">)))</span>
+
+<span class="n">a</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;a&quot;</span><span class="p">)[</span><span class="mi">2</span><span class="p">:</span><span class="mi">5</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;aa&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;aaa&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;aaaa&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">a</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;aaaaa&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;&#39;]
+[&#39;a&#39;]
+[&#39;aaaaa&#39;]
+[]
+[&#39;aa&#39;]
+[]
+[&#39;aaaa&#39;]
+[]
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Repetitions can be recursive or loopy, and greedy or not. All have
+advantages and disadvantages. List comprehension implements loopy non-greedy
+repetition. You can access the API for the four implementations directly at
+<code class="xref py py-class docutils literal notranslate"><span class="pre">Repetition</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Greedy</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">repetition()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">greedy()</span></code>.
+For maximum performance on long repetitions, apply <cite>decache</cite> to remove any
+caching from the parser to be repeated before creating the repetition.</p>
+</div>
+<p>Sometimes it’s useful to return the first of multiple matches. As is customary,
+this <a class="reference external" href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">PEG</a>
+alteration is introduced with the division operator.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+<span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">select</span> <span class="o">/</span> <span class="n">from_stuff</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">select</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39;&#39;}))]
+[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39; * from table&#39;}))]
+[]
+</pre></div>
+</div>
+<p>At this point, you’re probably wondering how Tlang is different from a parser
+generator framework that returns strings instead of parse trees. Because the
+output of Tlang parsers shares the same type as its input string, Tlang parsers
+can be composed seamlessly. Compositions (in conjuction with lookaheads) can be
+used to specify a superset of <a class="reference external" href="https://en.wikipedia.org/wiki/Boolean_grammar">Boolean grammars</a>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+<span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">statement</span> <span class="o">*</span> <span class="n">select</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39;&#39;}))]
+[(&#39;select&#39;, immutables.Map({&#39;&#39;: &#39; * from table&#39;}))]
+[]
+</pre></div>
+</div>
+<p>This composition is effectively parsing “select” or “from stuff” and then just
+“select” out of that result. This is of course equivalent to just parsing
+“select”.</p>
+</section>
+<section id="templates-and-references">
+<h2>Templates and References<a class="headerlink" href="#templates-and-references" title="Permalink to this headline"></a></h2>
+<p>To make use of this concept for transpilation, we introduce our first context
+sensitive parser: the <code class="xref py py-class docutils literal notranslate"><span class="pre">Template</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+<span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">statement</span> <span class="o">*</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39;&#39;}))]
+[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39; * from table&#39;}))]
+[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39; select *&#39;}))]
+[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39; select *&#39;}))]
+</pre></div>
+</div>
+<p>Templates can be thought of as string formatting. In this case, the template
+will ingest anything and return <code class="docutils literal notranslate"><span class="pre">drop</span></code>. This behavior can be useful for
+trimming or removing whitespace. However, Templates become very powerful when
+combined with references.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="p">(</span><span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s1">&#39;match&#39;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="n">statement</span> <span class="o">*</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s2">&quot;don&#39;t </span><span class="si">{match}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table select *&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&quot;don&#39;t select&quot;]
+[&quot;don&#39;t from table&quot;]
+[]
+</pre></div>
+</div>
+<p>References store the output string of the parse under a specified key within
+the context. Templates can make use of those entries for string formatting.
+Let’s take a look.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="p">(</span><span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s1">&#39;match&#39;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">*=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s2">&quot;don&#39;t </span><span class="si">{match}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">,</span> <span class="n">return_context</span><span class="o">=</span><span class="kc">True</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&quot;don&#39;t select&quot;, immutables.Map({&#39;&#39;: &#39;&#39;, &#39;match&#39;: &#39;select&#39;}))]
+</pre></div>
+</div>
+<p>Note that Templates will return no parses (but not raise an exception) when a
+nonexistant key is referenced from the context.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">select</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s1">&#39;nested&#39;</span><span class="p">)</span>
+<span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
+<span class="n">statement</span> <span class="o">=</span> <span class="p">(</span><span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span><span class="p">)</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s1">&#39;match&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;don&#39;t </span><span class="si">{match}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> don&#39;t </span><span class="si">{match.nested}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;don&#39;t </span><span class="si">{nonexistent}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&quot;don&#39;t from table&quot;]
+[]
+[]
+</pre></div>
+</div>
+<p>Composition with Templates is common enough we included <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.compT()</span></code>
+as a shortcut. Note that empty delimiters denote the text passed to the
+template since the context key for the input string is an empty string.</p>
+<p>You can parse exact matches of the results of previous parses with <code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code>.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">variable</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
+<span class="n">x</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s1">&#39;v1&#39;</span><span class="p">)</span>
+<span class="n">y</span> <span class="o">=</span> <span class="n">variable</span><span class="o">.</span><span class="n">ref</span><span class="p">(</span><span class="s1">&#39;v2&#39;</span><span class="p">)</span>
+<span class="n">perfect_square</span> <span class="o">=</span> <span class="n">x</span> <span class="o">+</span> <span class="s1">&#39;^2 + &#39;</span> <span class="o">+</span> <span class="n">y</span> <span class="o">+</span> <span class="s1">&#39;^2 + 2&#39;</span> <span class="o">+</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Ref</span><span class="p">(</span><span class="s1">&#39;v1&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Ref</span><span class="p">(</span><span class="s1">&#39;v2&#39;</span><span class="p">)</span>
+<span class="n">factor</span> <span class="o">=</span> <span class="n">perfect_square</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s1">&#39;(</span><span class="si">{v1}</span><span class="s1"> + </span><span class="si">{v2}</span><span class="s1">)^2&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">factor</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;x^2 + y^2 + 2xy&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">factor</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;y^2 + x^2 + 2yx&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">factor</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;y^2 + x^2 + 2xx&quot;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;(x + y)^2&#39;]
+[&#39;(y + x)^2&#39;]
+[]
+</pre></div>
+</div>
+</section>
+<section id="recursion">
+<h2>Recursion<a class="headerlink" href="#recursion" title="Permalink to this headline"></a></h2>
+<p>BNF handles self reference nicely because it’s a spec that doesn’t inherently
+need to compile. However, like most langauges, Python requires variables be
+declared before they are referenced. This makes creating self-referencing
+transpilers less straightfoward.</p>
+<p>For example, let’s say I want a json spec. Json can be embedded in json. So how
+do we define json without defining json? Tlang starts with a placeholder and
+introduces the self reference later.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">quote</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="n">string</span> <span class="o">=</span> <span class="n">quote</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="n">quote</span> <span class="o">+</span> <span class="n">tlang</span><span class="o">.</span><span class="n">wild</span><span class="p">)[:]</span> <span class="o">+</span> <span class="n">quote</span>
+<span class="n">integer</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">digit</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="c1"># doesn&quot;t start with 0 unless is 0</span>
+<span class="n">integer</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">integer</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;0&quot;</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">integer</span> <span class="o">|</span> <span class="n">string</span> <span class="o">|</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+<span class="n">whitespace</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)[:]</span>
+<span class="n">trim_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
+<span class="n">delete_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">key_value</span> <span class="o">=</span> <span class="n">string</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span> <span class="o">+</span> <span class="n">value</span>
+<span class="n">array</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">delimeted</span><span class="p">(</span><span class="n">key_value</span><span class="p">,</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span><span class="p">)</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">array</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">delimeted</span><span class="p">(</span><span class="n">key_value</span><span class="p">,</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span><span class="p">)</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">mapping</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+<span class="n">fmt_json</span> <span class="o">=</span> <span class="n">array</span> <span class="o">|</span> <span class="n">mapping</span>
+<span class="c1"># fill placeholder with self reference</span>
+<span class="n">fmt_json</span> <span class="o">=</span> <span class="n">fmt_json</span><span class="o">.</span><span class="n">recurrence</span><span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{ &quot;key&quot;   : [&quot;value&quot; , 3,  {&quot;two : 2 } ]  }&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+</pre></div>
+</div>
+</section>
+<section id="macros">
+<h2>Macros<a class="headerlink" href="#macros" title="Permalink to this headline"></a></h2>
+<p>Sometimes you have a perfectly good transpiler for one task that’s <em>almost</em>
+perfect for another task. For example, say you built something that traspiles
+some dialect of SQL. Now you’re working on something that transpiles a slightly
+different dialect. You probably have a lot of lines that are just fine with one
+or two rules that need to be changed to something else.  You could write a
+function or class that can return a transpiler for either option, but do you
+really want to refactor that function every time you come up with a slightly
+different use case? Tlang transpilers come with a <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.recur()</span></code>
+method for this scenario. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.recur()</span></code> will recursively apply a
+function to each component of your transpiler, building a modified copy from
+the ground up.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">quote</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;&quot;&#39;</span><span class="p">)</span>
+<span class="n">string</span> <span class="o">=</span> <span class="n">quote</span> <span class="o">+</span> <span class="p">(</span><span class="o">-</span><span class="n">quote</span> <span class="o">+</span> <span class="n">tlang</span><span class="o">.</span><span class="n">wild</span><span class="p">)[:]</span> <span class="o">+</span> <span class="n">quote</span>
+<span class="n">integer</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">digit</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="c1"># doesn&#39;t start with 0 unless is 0</span>
+<span class="n">integer</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;0&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="n">integer</span><span class="p">)</span> <span class="o">/</span> <span class="s1">&#39;0&#39;</span>
+<span class="n">value</span> <span class="o">=</span> <span class="n">integer</span> <span class="o">|</span> <span class="n">string</span> <span class="o">|</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Placeholder</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
+<span class="n">whitespace</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)[:]</span>
+<span class="n">trim_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s1">&#39; &#39;</span><span class="p">)</span>
+<span class="n">delete_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">comma_sep</span><span class="p">(</span><span class="n">entry</span><span class="p">):</span>
+    <span class="n">entry</span> <span class="o">+=</span> <span class="n">delete_whitespace</span>
+    <span class="k">return</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">entry</span> <span class="o">+</span> <span class="p">(</span><span class="s1">&#39;,&#39;</span> <span class="o">+</span> <span class="n">trim_whitespace</span> <span class="o">+</span> <span class="n">entry</span><span class="p">)[:]</span>
+<span class="n">array</span> <span class="o">=</span> <span class="s1">&#39;[&#39;</span> <span class="o">+</span> <span class="n">comma_sep</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;]&#39;</span>
+<span class="n">key_value</span> <span class="o">=</span> <span class="n">string</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="n">trim_whitespace</span> <span class="o">+</span> <span class="n">value</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="s1">&#39;{&#39;</span> <span class="o">+</span> <span class="n">comma_sep</span><span class="p">(</span><span class="n">key_value</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;}&#39;</span>
+<span class="n">fmt_json</span> <span class="o">=</span> <span class="n">array</span> <span class="o">|</span> <span class="n">mapping</span>
+<span class="c1"># fill placeholder with self reference</span>
+<span class="n">fmt_json</span> <span class="o">=</span> <span class="n">fmt_json</span><span class="o">.</span><span class="n">recurrence</span><span class="p">(</span><span class="s1">&#39;json&#39;</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">swap_brackets</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s1">&#39;[&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;(&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">t</span><span class="o">.</span><span class="n">text</span> <span class="o">==</span> <span class="s1">&#39;]&#39;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;)&#39;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">t</span>
+<span class="n">fmt_not_quite_json</span> <span class="o">=</span> <span class="n">fmt_json</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="n">tlang</span><span class="o">.</span><span class="n">typed</span><span class="p">({</span><span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">:</span> <span class="n">swap_brackets</span><span class="p">}))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{&quot;key&quot;: [&quot;value&quot; , 3,  2]  }&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{&quot;key&quot;: (&quot;value&quot; , 3,  2)  }&#39;</span><span class="p">)))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_not_quite_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{&quot;key&quot;: [&quot;value&quot; , 3,  2]  }&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_not_quite_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{&quot;key&quot;: (&quot;value&quot; , 3,  2)  }&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;{&quot;key&quot;: [&quot;value&quot;, 3, 2]}&#39;]
+[]
+[]
+[&#39;{&quot;key&quot;: (&quot;value&quot;, 3, 2)}&#39;]
+</pre></div>
+</div>
+<p>Tlang also provides a <code class="xref py py-func docutils literal notranslate"><span class="pre">typed()</span></code> convenience method for generating single
+dispatch functions. As another example, consider swapping concatenations for
+alterations.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">rule1</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="s1">&#39;b&#39;</span>
+<span class="n">rule2</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="s1">&#39;d&#39;</span>
+<span class="n">rule3</span> <span class="o">=</span> <span class="n">rule1</span> <span class="o">+</span> <span class="n">rule2</span>
+
+<span class="n">rule4</span> <span class="o">=</span> <span class="n">rule3</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="n">tlang</span><span class="o">.</span><span class="n">typed</span><span class="p">({</span>
+    <span class="n">tlang</span><span class="o">.</span><span class="n">Alteration</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">left</span> <span class="o">+</span> <span class="n">t</span><span class="o">.</span><span class="n">right</span><span class="p">,</span>
+    <span class="n">tlang</span><span class="o">.</span><span class="n">Concatenation</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">t</span><span class="o">.</span><span class="n">left</span> <span class="o">|</span> <span class="n">t</span><span class="o">.</span><span class="n">right</span><span class="p">}))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ac&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;bc&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ad&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;bd&#39;</span><span class="p">)))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ab&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;cd&#39;</span><span class="p">)))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule4</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ac&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule4</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;bc&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule4</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ad&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule4</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;bd&#39;</span><span class="p">)))</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule4</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;ab&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule4</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;cd&#39;</span><span class="p">)))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;ac&#39;]
+[&#39;bc&#39;]
+[&#39;ad&#39;]
+[&#39;bd&#39;]
+[]
+[]
+[]
+[]
+[]
+[]
+[&#39;ab&#39;]
+[&#39;cd&#39;]
+</pre></div>
+</div>
+</section>
+<section id="static-analysis">
+<h2>Static Analysis<a class="headerlink" href="#static-analysis" title="Permalink to this headline"></a></h2>
+<p>Under the hood, transpilers work similar to packrat parser generators. There
+are of course more Tlang transpiler primitives than in most implementations of
+packrat parser generators, and Tlang’s parsers can be context sensitive as well.
+In practice, this means some piece of the context is cached as well as the
+input text. However, you may notice that for every transpiler but <code class="xref py py-class docutils literal notranslate"><span class="pre">Lazy</span></code>
+one can deduce what information the transpiler needs to read and write to
+without running it on any inputs. This sort of static analysis is handled under
+the hood within Tlang. Every transpiler has a <code class="docutils literal notranslate"><span class="pre">read_context</span></code> attribute. These
+are or behave like <code class="docutils literal notranslate"><span class="pre">frozenset</span></code> s.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">rule</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s1">&#39;</span><span class="si">{name1}</span><span class="s1"> </span><span class="si">{name3}</span><span class="s1">&#39;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">read_context</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name1&#39;, &#39;name3&#39;})
+</pre></div>
+</div>
+<p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
+(e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Combinator</span></code> instances) will attempt to cache their operations.
+These transpilers use their read_context in conjunction with the context it
+receives to derive a key for its own cache. They likewise derive the piece of
+output context stored within the cache from the write_context. This is
+respectively merged with the true input context upon cache lookups to simulate
+a true execution.</p>
+<p>Combinators (like alterations, concatenations, and compositions) effectively
+union child <code class="docutils literal notranslate"><span class="pre">read_context</span></code> attributes since caching them needs to cover all
+possibilities of their child parsers.</p>
+<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Anything</span></code> is a class that implements just enough <code class="docutils literal notranslate"><span class="pre">frozenset</span></code> methods
+to act like it stores everything. Kind of like <code class="docutils literal notranslate"><span class="pre">nan</span></code> in floating point
+arithmetic.</p>
+<section id="cache-sharing">
+<h3>Cache Sharing<a class="headerlink" href="#cache-sharing" title="Permalink to this headline"></a></h3>
+<p>If you create two instances of the same transpiler, they’ll have their own
+caches. That may be fine if they never end up seeing the same inputs, but
+would otherwise lead to caching the same process separately within each
+transpiler. So double the memory, and double the execution time to get
+complete caching. Addressing this automatically is nontrivial. While it is
+straightforward to catch the same transpiler type being initialized with the
+same arguments, it’s less straightforward to catch ad hoc scenarios. For
+example, you need to account for associativity of concatenations and
+commutativity of alterations. If that was <em>all</em> there was to it, we’d have you
+covered. But once you start iterating over de Morgan’s laws to switch between
+<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">|</span> <span class="pre">(b</span> <span class="pre">+</span> <span class="pre">c)</span></code> and <code class="docutils literal notranslate"><span class="pre">(a</span> <span class="pre">|</span> <span class="pre">b)</span> <span class="pre">+</span> <span class="pre">(a</span> <span class="pre">|</span> <span class="pre">c)</span></code>,  you have to start asking <em>which</em>
+caches you want to share. There may be multiple options if <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">+</span> <span class="pre">c</span></code> and
+<code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">|</span> <span class="pre">b</span></code> both exist elsewhere in isolation! We do hope to build out a series
+of optimization passes for this kind of thing using <code class="xref py py-class docutils literal notranslate"><span class="pre">Transpiler.recur</span></code>
+in the future, but for now we consider it premature optimization for the
+project roadmap.</p>
+<p>In the mean time, reusing variables goes a long way to overcome this issue and
+speed up the resulting transpiler. Also it tends to makes your code more
+readable anyway!</p>
+</section>
+</section>
+<section id="creating-custom-one-offs">
+<h2>Creating Custom One-Offs<a class="headerlink" href="#creating-custom-one-offs" title="Permalink to this headline"></a></h2>
+<p>There were two directions Tlang take from here. Either we try to anticipate
+every circumstance and keep creating new <code class="docutils literal notranslate"><span class="pre">Transpiler</span></code> classes for them, or we
+make it as simple as possible to build your own transpilers for one-off
+scenarios. After a bit of eating our own dog food, Tlang switched to the latter.</p>
+<p>A common scenario is tracking declared variables. There seem to be too many
+variations of this task to maintain a one-size-fits-all transpiler class for
+them. While you may end up with multiple such scenarios that fit neatly under
+one class, you probably are going to have a parser that adds declared variables
+to a registry, maybe another that tests whether a variable name is listed in
+different registries, etc. If you’re not a religious follower of OO doctrine,
+you probably just want to reduce boilerplate without sacrificing readability.
+Enter the following decorators.</p>
+<div class="topic">
+<p class="topic-title">One off decorators</p>
+<ul class="simple">
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code> for general transpilers</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">contextonly()</span></code> for transpilers that output the empty string</p></li>
+<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">contextfree()</span></code> for transpilers that only read the input string</p></li>
+</ul>
+</div>
+<p>You can use <code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code> for anything you can use <code class="xref py py-func docutils literal notranslate"><span class="pre">contextonly()</span></code>
+and <code class="xref py py-func docutils literal notranslate"><span class="pre">contextfree()</span></code> for, but the latter make their respective use cases
+more readable. The first two take an iterable of keys the that your transpiler
+will read from the context. They default to defining a transpiler that only
+reads the input string.</p>
+</section>
+<section id="generative-mode">
+<h2>Generative Mode<a class="headerlink" href="#generative-mode" title="Permalink to this headline"></a></h2>
+<p>A side effect of Tlang’s structure is being able to enumerate instances of the
+language it generates with little modification. This feature was included for
+debugging, educational purposes, and the potential to build training synthetic
+training data to train ML based approaches to code transformation. To enumerate
+all possible outputs of a transpiler, just call the <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code> method with no
+arguments, or equivalently, pass <code class="docutils literal notranslate"><span class="pre">None</span></code> as the input string.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
+
+<span class="n">rule1</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;a&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="s1">&#39;b&#39;</span>
+<span class="n">rule2</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s1">&#39;c&#39;</span><span class="p">)</span> <span class="o">|</span> <span class="s1">&#39;d&#39;</span>
+<span class="n">rule3</span> <span class="o">=</span> <span class="n">rule1</span> <span class="o">+</span> <span class="n">rule2</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">rule3</span><span class="o">.</span><span class="n">run</span><span class="p">()))</span>
+</pre></div>
+</div>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;ac&#39;, &#39;bc&#39;, &#39;ad&#39;, &#39;bd&#39;]
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Tgen" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="core.html" class="btn btn-neutral float-right" title="core" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alex Eftimiades.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

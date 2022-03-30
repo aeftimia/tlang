@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tlang.core &mdash; tlang 0.0.2 documentation</title>
+      <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="../../index.html" class="icon icon-home"> tlang
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../introduction.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../core.html">core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">tlang</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+      <li>tlang.core</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tlang.core</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">string</span>
+
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">starmap</span> <span class="k">as</span> <span class="n">_starmap</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span> <span class="k">as</span> <span class="n">_deque</span>
+<span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span> <span class="k">as</span> <span class="n">_Map</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span> <span class="k">as</span> <span class="n">_lru_cache</span><span class="p">,</span> <span class="n">singledispatch</span> <span class="k">as</span> <span class="n">_singledispatch</span>
+
+
+<div class="viewcode-block" id="InfiniteLoop"><a class="viewcode-back" href="../../core.html#tlang.core.InfiniteLoop">[docs]</a><span class="k">class</span> <span class="nc">InfiniteLoop</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="diff"><a class="viewcode-back" href="../../core.html#tlang.core.diff">[docs]</a><span class="k">def</span> <span class="nf">diff</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">initial</span><span class="p">):</span>
+    <span class="n">deleted</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">initial</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">new</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">new</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">eq</span> <span class="o">=</span> <span class="n">value</span> <span class="o">==</span> <span class="n">initial</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">eq</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">new</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">new</span><span class="p">,</span> <span class="n">deleted</span></div>
+
+
+<div class="viewcode-block" id="merge"><a class="viewcode-back" href="../../core.html#tlang.core.merge">[docs]</a><span class="k">def</span> <span class="nf">merge</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">modifications</span><span class="p">):</span>
+    <span class="n">additions</span><span class="p">,</span> <span class="n">deletions</span> <span class="o">=</span> <span class="n">modifications</span>
+    <span class="k">for</span> <span class="n">deletion</span> <span class="ow">in</span> <span class="n">deletions</span><span class="p">:</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">deletion</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">additions</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="apply_mask"><a class="viewcode-back" href="../../core.html#tlang.core.apply_mask">[docs]</a><span class="k">def</span> <span class="nf">apply_mask</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">mask</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Apply mask.&quot;&quot;&quot;</span>
+    <span class="n">keys</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span> <span class="o">-</span> <span class="n">mask</span><span class="p">:</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">context</span></div>
+
+
+<div class="viewcode-block" id="set_scoped"><a class="viewcode-back" href="../../core.html#tlang.core.set_scoped">[docs]</a><span class="k">def</span> <span class="nf">set_scoped</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">keys</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create or modify an entry of nested HAMTs.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        context: HAMT</span>
+<span class="sd">        keys: iterable of nested keys</span>
+<span class="sd">        value: leaf value to set at context[key[0]][key[1]]...</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HAMT&quot;&quot;&quot;</span>
+    <span class="n">head</span><span class="p">,</span> <span class="o">*</span><span class="n">tail</span> <span class="o">=</span> <span class="n">keys</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">tail</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+    <span class="n">node</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">root_context</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">head</span><span class="p">,</span> <span class="n">set_scoped</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="n">tail</span><span class="p">,</span> <span class="n">value</span><span class="p">))</span></div>
+
+
+<div class="viewcode-block" id="get_scoped"><a class="viewcode-back" href="../../core.html#tlang.core.get_scoped">[docs]</a><span class="k">def</span> <span class="nf">get_scoped</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">keys</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Retrieve an entry from a nested HAMT.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        context: HAMT</span>
+<span class="sd">        keys: iterable of nested keys</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        HAMT&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">:</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">context</span></div>
+
+
+<div class="viewcode-block" id="Anything"><a class="viewcode-back" href="../../core.html#tlang.core.Anything">[docs]</a><span class="k">class</span> <span class="nc">Anything</span><span class="p">:</span>
+
+    <span class="sd">&quot;&quot;&quot;Behaves like a context object that contains everything. Use as leaf node</span>
+<span class="sd">    for masks.&quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;Anything&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__and__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="fm">__rand__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span></div>
+
+
+<span class="n">anything</span> <span class="o">=</span> <span class="n">Anything</span><span class="p">()</span>
+<span class="n">root_context</span> <span class="o">=</span> <span class="n">_Map</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Transpiler"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler">[docs]</a><span class="k">class</span> <span class="nc">Transpiler</span><span class="p">:</span>
+<div class="viewcode-block" id="Transpiler.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_context</span> <span class="o">=</span> <span class="n">root_context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="nb">type</span><span class="p">(</span><span class="n">other</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">args</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">kwargs</span>
+
+<div class="viewcode-block" id="Transpiler.new"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.new">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like ``__new__`` but doesn&#39;t trigger ``__init__``.  Useful for</span>
+<span class="sd">        bailing out of creating new instances when it wouldn&#39;t make sense to do</span>
+<span class="sd">        so.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transpiler.reset"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_context</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">])):</span>
+        <span class="n">write_context</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">write_context</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_context</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__hash__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Transpiler.copy"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.copy">[docs]</a>    <span class="k">def</span> <span class="nf">copy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">new_args</span><span class="p">,</span> <span class="o">**</span><span class="n">new_kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Recreat this object using the args and kwargs that generated it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            *new_args: New arguments with which to update the ones originally</span>
+<span class="sd">                used to create this object.</span>
+<span class="sd">            **new_kwargs: New keyword arguments with which to update the ones</span>
+<span class="sd">                originally used to create this object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Copy of self with specified alterations&quot;&quot;&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">new_args</span> <span class="o">+</span> <span class="nb">tuple</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">new_args</span><span class="p">):])</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+        <span class="n">kwargs</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">new_kwargs</span><span class="p">)</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">init_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_context</span>
+        <span class="k">return</span> <span class="n">new</span></div>
+
+<div class="viewcode-block" id="Transpiler.set_init_context"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.set_init_context">[docs]</a>    <span class="k">def</span> <span class="nf">set_init_context</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Override to change context object used for ``run``</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            init_context (dict-like): default context&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_context</span> <span class="o">=</span> <span class="n">_Map</span><span class="p">(</span><span class="n">init_context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transpiler.get_init_context"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.get_init_context">[docs]</a>    <span class="k">def</span> <span class="nf">get_init_context</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_context</span></div>
+
+<div class="viewcode-block" id="Transpiler.ref"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.ref">[docs]</a>    <span class="k">def</span> <span class="nf">ref</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">Named</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transpiler.process"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpile input without caching</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            key: tuple with input string as first argument and input context as</span>
+<span class="sd">            second arugment.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Generator of tuples of the form (output string, (remaining input</span>
+<span class="sd">            string, output context))</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
+
+<div class="viewcode-block" id="Transpiler.run"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_context</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Transpile text, returning only output strings (optionally with final</span>
+<span class="sd">            context) of complete parses.</span>
+
+
+<span class="sd">        Args:</span>
+<span class="sd">            text (string or None): input sting</span>
+<span class="sd">            context: Context object or None for default context object of instance</span>
+<span class="sd">            return_context (bool): Return final context in addition to ouput strings.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Generator of output strings of complete parses. If</span>
+<span class="sd">            ``return_context=True`` then generate tuples with output string and</span>
+<span class="sd">            final context.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">context</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_init_context</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">context</span> <span class="o">=</span> <span class="n">_Map</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">context</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">text</span><span class="p">)</span>
+        <span class="n">parses</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">text</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">parses</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="p">((</span><span class="n">output</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+                   <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">parses</span> <span class="k">if</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">return_context</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">new</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">s</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">new</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transpiler.complete"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.complete">[docs]</a>    <span class="k">def</span> <span class="nf">complete</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Return only complete parses. Useful for composing otherwise</span>
+<span class="sd">        independent transformations without passing incomplete transformations</span>
+<span class="sd">        through.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Completed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">repr</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">))</span>
+        <span class="n">kwargs</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="nb">repr</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span>
+                           <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">if</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">+=</span> <span class="s2">&quot;, &quot;</span> <span class="o">+</span> <span class="n">kwargs</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">(</span><span class="si">{</span><span class="n">args</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="Transpiler.__call__"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transpiler.comp"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.comp">[docs]</a>    <span class="k">def</span> <span class="nf">comp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Feed output of this transpiler into input of another transpiler.</span>
+<span class="sd">        Remember incomplete parses are fed through too!&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Composed</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Transpiler.compT"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.compT">[docs]</a>    <span class="k">def</span> <span class="nf">compT</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">,</span> <span class="n">ldelim</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="n">rdelim</span><span class="o">=</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;__output__&quot;</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a ``Template`` and compose this parser with it.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Composed</span><span class="p">(</span>
+            <span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">Template</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ldelim</span><span class="o">=</span><span class="n">ldelim</span><span class="p">,</span> <span class="n">rdelim</span><span class="o">=</span><span class="n">rdelim</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Transpiler.inv"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.inv">[docs]</a>    <span class="k">def</span> <span class="nf">inv</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Negative lookahead plus wildcard character&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">-</span><span class="bp">self</span> <span class="o">+</span> <span class="n">wild</span></div>
+
+    <span class="k">def</span> <span class="fm">__or__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alteration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Alteration</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__ror__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alteration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Alteration</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__pos__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Positive lookahead&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="o">--</span><span class="bp">self</span>
+
+<div class="viewcode-block" id="Transpiler.__add__"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Concatenation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Concatenation</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span></div>
+
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Concatenation&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Concatenation</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+    <span class="fm">__mul__</span> <span class="o">=</span> <span class="n">comp</span>
+
+    <span class="k">def</span> <span class="fm">__rmul__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">other</span><span class="o">.</span><span class="n">comp</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Transpiler.__invert__"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.__invert__">[docs]</a>    <span class="k">def</span> <span class="fm">__invert__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Optional&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">null</span> <span class="o">|</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Transpiler.__neg__"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.__neg__">[docs]</a>    <span class="k">def</span> <span class="fm">__neg__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Negative lookahead&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Not</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__truediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PEG Alteration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PEGAlteration</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="fm">__rtruediv__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;PEG Alteration&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">PEGAlteration</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="n">other</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Transpiler.__getitem__"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">slice_key</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Repetition&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">slice_key</span><span class="o">.</span><span class="n">start</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">start_idx</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">start_idx</span> <span class="o">=</span> <span class="n">slice_key</span><span class="o">.</span><span class="n">start</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">Concatenation</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="bp">self</span><span class="p">,)</span> <span class="o">*</span> <span class="n">start_idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">slice_key</span><span class="o">.</span><span class="n">step</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">step_idx</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">step_idx</span> <span class="o">=</span> <span class="n">slice_key</span><span class="o">.</span><span class="n">step</span>
+        <span class="n">step</span> <span class="o">=</span> <span class="n">Concatenation</span><span class="o">.</span><span class="n">new</span><span class="p">((</span><span class="bp">self</span><span class="p">,)</span> <span class="o">*</span> <span class="n">step_idx</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">slice_key</span><span class="o">.</span><span class="n">stop</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">Repetition</span><span class="p">(</span><span class="n">step</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">start_idx</span><span class="p">:</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">start</span> <span class="o">+</span> <span class="n">new</span>
+            <span class="k">return</span> <span class="n">new</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="n">start</span>
+            <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">((</span><span class="n">slice_key</span><span class="o">.</span><span class="n">stop</span> <span class="o">-</span> <span class="n">start_idx</span><span class="p">)</span> <span class="o">//</span> <span class="n">step_idx</span><span class="p">):</span>
+                <span class="n">new</span> <span class="o">|=</span> <span class="n">new</span> <span class="o">+</span> <span class="n">step</span>
+            <span class="k">return</span> <span class="n">new</span></div>
+
+    <span class="k">def</span> <span class="fm">__abs__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Only return one parse for each unique output string&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">Unique</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Transpiler.recurrence"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.recurrence">[docs]</a>    <span class="k">def</span> <span class="nf">recurrence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Create a copy and replace any ``Placeholder`` with identifier</span>
+<span class="sd">        ``identifier`` with self reference. Return the modified copy&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">stitch</span><span class="p">({</span><span class="n">identifier</span><span class="p">:</span> <span class="bp">self</span><span class="p">})[</span><span class="n">identifier</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="Transpiler.recur"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.recur">[docs]</a>    <span class="k">def</span> <span class="nf">recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a new transpiler from the result of recursively applying a</span>
+<span class="sd">        function to all the transpilers that comprise this one.&quot;&quot;&quot;</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">transformations</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">find_transformations</span><span class="p">(</span><span class="n">transformations</span><span class="p">))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">update_links</span><span class="p">(</span><span class="n">transformations</span><span class="p">))</span>
+        <span class="n">reset</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new</span></div>
+
+    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Build a new transpiler from the result of recursively applying a</span>
+<span class="sd">        function to all the transpilers that comprise this one. Rather than</span>
+<span class="sd">        fixing broken references, just track which transpilers the resulting</span>
+<span class="sd">        transpilers were derived from by setting the new transpiler&#39;s ``prev``</span>
+<span class="sd">        attribute to ``self``. Subsequent passes in ``recur`` gather these</span>
+<span class="sd">        transformations and use them to fix broken links.&quot;&quot;&quot;</span>
+
+        <span class="n">new</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+<div class="viewcode-block" id="Transpiler.visit"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.visit">[docs]</a>    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Like recur but don&#39;t build anything new. Just apply the function to</span>
+<span class="sd">        each transpiler that comprise this one&quot;&quot;&quot;</span>
+        <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="stitch"><a class="viewcode-back" href="../../core.html#tlang.core.stitch">[docs]</a><span class="k">def</span> <span class="nf">stitch</span><span class="p">(</span><span class="n">lookup</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Stitch transpilers by reference, replacing Placeholders with Links.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        lookup: hamt from placeholder identifiers to parsers</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        hamt from placeholder identifiers to properly linked parsers&quot;&quot;&quot;</span>
+    <span class="n">link_lookup</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">Link</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="c1"># similar sequence to recur</span>
+    <span class="n">lookup</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span>
+            <span class="n">typed</span><span class="p">({</span><span class="n">Placeholder</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">link_lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">identifier</span><span class="p">,</span> <span class="n">t</span><span class="p">)})</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+    <span class="p">}</span>
+    <span class="n">transformations</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">value</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">find_transformations</span><span class="p">(</span><span class="n">transformations</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">value</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">update_links</span><span class="p">(</span><span class="n">transformations</span><span class="p">))</span>
+    <span class="c1"># but link&#39;s parser needs to be reset</span>
+    <span class="c1"># because of self reference</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">link</span> <span class="ow">in</span> <span class="n">link_lookup</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">link</span><span class="o">.</span><span class="n">set_parser</span><span class="p">(</span><span class="n">lookup</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+    <span class="c1"># Now we can reinitialize</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="n">reset</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lookup</span></div>
+
+
+<div class="viewcode-block" id="find_transformations"><a class="viewcode-back" href="../../core.html#tlang.core.find_transformations">[docs]</a><span class="k">def</span> <span class="nf">find_transformations</span><span class="p">(</span><span class="n">transformations</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visitor</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="n">transformations</span><span class="p">[</span><span class="n">t</span><span class="o">.</span><span class="n">prev</span><span class="p">]</span> <span class="o">=</span> <span class="n">t</span>
+
+    <span class="k">return</span> <span class="n">visitor</span></div>
+
+
+<div class="viewcode-block" id="update_links"><a class="viewcode-back" href="../../core.html#tlang.core.update_links">[docs]</a><span class="k">def</span> <span class="nf">update_links</span><span class="p">(</span><span class="n">transformations</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">visitor</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="n">old_link</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">prev</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">old_link</span><span class="p">,</span> <span class="n">Link</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="n">old_parser</span> <span class="o">=</span> <span class="n">old_link</span><span class="o">.</span><span class="n">parser</span>
+        <span class="n">new_parser</span> <span class="o">=</span> <span class="n">transformations</span><span class="p">[</span><span class="n">old_parser</span><span class="p">]</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">set_parser</span><span class="p">(</span><span class="n">new_parser</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">typed</span><span class="p">({</span><span class="n">Link</span><span class="p">:</span> <span class="n">visitor</span><span class="p">})</span></div>
+
+
+<div class="viewcode-block" id="clear_visit_cache"><a class="viewcode-back" href="../../core.html#tlang.core.clear_visit_cache">[docs]</a><span class="k">def</span> <span class="nf">clear_visit_cache</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="n">t</span><span class="o">.</span><span class="n">visit</span><span class="o">.</span><span class="n">cache_clear</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="reset"><a class="viewcode-back" href="../../core.html#tlang.core.reset">[docs]</a><span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reinitialize all transpilers that comprise its argument until none of</span>
+<span class="sd">    those transpilers&#39; read and write contexts change.&quot;&quot;&quot;</span>
+    <span class="n">inconsistent</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="nf">reinit</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+        <span class="k">nonlocal</span> <span class="n">inconsistent</span>
+        <span class="n">read_context</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">read_context</span>
+        <span class="n">t</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">t</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">t</span><span class="o">.</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">inconsistent</span> <span class="o">|=</span> <span class="n">read_context</span> <span class="o">!=</span> <span class="n">t</span><span class="o">.</span><span class="n">read_context</span>
+
+    <span class="k">while</span> <span class="n">inconsistent</span><span class="p">:</span>
+        <span class="n">inconsistent</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">reinit</span><span class="p">)</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">clear_visit_cache</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="roundrobin"><a class="viewcode-back" href="../../core.html#tlang.core.roundrobin">[docs]</a><span class="k">def</span> <span class="nf">roundrobin</span><span class="p">(</span><span class="n">iterables</span><span class="p">):</span>
+    <span class="s2">&quot;roundrobin((&#39;ABC&#39;, &#39;D&#39;, &#39;EF&#39;)) --&gt; &#39;A&#39; &#39;D&#39; &#39;E&#39; &#39;B&#39; &#39;F&#39; &#39;C&#39;&quot;</span>
+    <span class="n">iterators</span> <span class="o">=</span> <span class="n">_deque</span><span class="p">()</span>
+    <span class="n">generators</span> <span class="o">=</span> <span class="nb">map</span><span class="p">(</span><span class="nb">iter</span><span class="p">,</span> <span class="n">iterables</span><span class="p">)</span>
+    <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">generators</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">iterators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
+    <span class="k">while</span> <span class="n">iterators</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="nb">next</span><span class="p">(</span><span class="n">iterators</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">iterators</span><span class="o">.</span><span class="n">rotate</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="n">iterators</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="transpiler"><a class="viewcode-back" href="../../core.html#tlang.core.transpiler">[docs]</a><span class="k">def</span> <span class="nf">transpiler</span><span class="p">(</span><span class="n">read_context</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">])):</span>
+    <span class="sd">&quot;&quot;&quot;Acts as decorator for quickly writing custom transpilers.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        read_context (iterable): read_context of transpiler</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        callable: Wrapper that returns a ``UserDefined``&quot;&quot;&quot;</span>
+    <span class="n">read_context</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">read_context</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">processor</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">FromProcessor</span><span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="n">read_context</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="FromProcessor"><a class="viewcode-back" href="../../core.html#tlang.core.FromProcessor">[docs]</a><span class="k">class</span> <span class="nc">FromProcessor</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a transpiler from a callable generator.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        processor (generator): Callable parser taking context and returning</span>
+<span class="sd">            tuple of output and context.</span>
+<span class="sd">        read_context (frozenset): read_context of parser</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Transpiler instance&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="FromProcessor.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.FromProcessor.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">processor</span><span class="p">,</span> <span class="n">read_context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">processor</span><span class="p">,</span> <span class="n">read_context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span> <span class="o">=</span> <span class="n">processor</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">=</span> <span class="n">read_context</span></div>
+
+<div class="viewcode-block" id="FromProcessor.process"><a class="viewcode-back" href="../../core.html#tlang.core.FromProcessor.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_processor</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Cached"><a class="viewcode-back" href="../../core.html#tlang.core.Cached">[docs]</a><span class="k">class</span> <span class="nc">Cached</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Base class for cached transpilers.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Cached.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Cached.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generators</span> <span class="o">=</span> <span class="p">{}</span></div>
+
+<div class="viewcode-block" id="Cached.__call__"><a class="viewcode-back" href="../../core.html#tlang.core.Cached.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Parse, cache, yield, gaurd for infinite loops.&quot;&quot;&quot;</span>
+        <span class="n">parses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="n">cache_key</span> <span class="o">=</span> <span class="n">apply_mask</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cache_key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache_process</span><span class="p">(</span><span class="n">parses</span><span class="p">,</span> <span class="n">cache_key</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">InfiniteLoop</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">return_cache</span><span class="p">(</span><span class="n">cache_key</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Cached.cache_process"><a class="viewcode-back" href="../../core.html#tlang.core.Cached.cache_process">[docs]</a>    <span class="k">def</span> <span class="nf">cache_process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parses</span><span class="p">,</span> <span class="n">cache_key</span><span class="p">,</span> <span class="n">initial_context</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Iterate over parses, caching them before yielding&quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">caching_generator</span><span class="p">():</span>
+            <span class="k">for</span> <span class="n">parse</span> <span class="ow">in</span> <span class="n">parses</span><span class="p">:</span>
+                <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="o">=</span> <span class="n">parse</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">diff</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">initial_context</span><span class="p">)))</span>
+                <span class="k">yield</span> <span class="n">parse</span>
+
+        <span class="n">generator</span> <span class="o">=</span> <span class="n">caching_generator</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="n">generator</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="n">generator</span>
+        <span class="k">except</span> <span class="n">InfiniteLoop</span><span class="p">:</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
+            <span class="k">raise</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Cached.return_cache"><a class="viewcode-back" href="../../core.html#tlang.core.Cached.return_cache">[docs]</a>    <span class="k">def</span> <span class="nf">return_cache</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_key</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">modifications</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]:</span>
+            <span class="k">yield</span> <span class="n">output</span><span class="p">,</span> <span class="n">merge</span><span class="p">(</span><span class="n">context</span><span class="p">,</span> <span class="n">modifications</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">generators</span><span class="p">[</span><span class="n">cache_key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span></div></div>
+
+
+<div class="viewcode-block" id="Template"><a class="viewcode-back" href="../../core.html#tlang.core.Template">[docs]</a><span class="k">class</span> <span class="nc">Template</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Template generated from concatenation of partitions (str) interleaved with the</span>
+<span class="sd">    result of fetching caches from context using keys.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Template.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Template.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">ldelim</span><span class="o">=</span><span class="s2">&quot;{&quot;</span><span class="p">,</span> <span class="n">rdelim</span><span class="o">=</span><span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="n">ldelim</span><span class="o">=</span><span class="n">ldelim</span><span class="p">,</span> <span class="n">rdelim</span><span class="o">=</span><span class="n">rdelim</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">text</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">partitions</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">text</span><span class="p">],</span> <span class="p">[]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">()</span>
+            <span class="k">return</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">partitions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">left</span> <span class="o">=</span> <span class="n">text</span>
+        <span class="n">read_context</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">while</span> <span class="n">text</span><span class="p">:</span>
+            <span class="n">left</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">remaining</span> <span class="o">=</span> <span class="n">text</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">ldelim</span><span class="p">)</span>
+            <span class="n">partitions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">left</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">remaining</span><span class="p">:</span>
+                <span class="k">break</span>
+            <span class="n">key</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">text</span> <span class="o">=</span> <span class="n">remaining</span><span class="o">.</span><span class="n">partition</span><span class="p">(</span><span class="n">rdelim</span><span class="p">)</span>
+            <span class="n">read_context</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+            <span class="n">keys</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">keys</span> <span class="o">=</span> <span class="n">keys</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">partitions</span> <span class="o">=</span> <span class="n">partitions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">read_context</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Template.process"><a class="viewcode-back" href="../../core.html#tlang.core.Template.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">subs</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">keys</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">yield</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">roundrobin</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">partitions</span><span class="p">,</span> <span class="n">subs</span><span class="p">))),</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Terminal"><a class="viewcode-back" href="../../core.html#tlang.core.Terminal">[docs]</a><span class="k">class</span> <span class="nc">Terminal</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+<div class="viewcode-block" id="Terminal.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Terminal.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">text</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">text</span></div>
+
+<div class="viewcode-block" id="Terminal.process"><a class="viewcode-back" href="../../core.html#tlang.core.Terminal.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="c1"># generative mode</span>
+        <span class="k">if</span> <span class="n">tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">,</span> <span class="n">context</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">test</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">test</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">test</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">:])</span></div>
+
+<div class="viewcode-block" id="Terminal.__add__"><a class="viewcode-back" href="../../core.html#tlang.core.Terminal.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Terminal</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Terminal</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+
+
+<span class="nd">@transpiler</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">identity</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="k">yield</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">],</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<span class="n">null</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="Ref"><a class="viewcode-back" href="../../core.html#tlang.core.Ref">[docs]</a><span class="k">class</span> <span class="nc">Ref</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+
+    <span class="sd">&quot;&quot;&quot;Match the exact output of a transpiler referenced by name. Scoped</span>
+<span class="sd">    references are specified with scopes separated by ``.``.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Ref.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Ref.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">|=</span> <span class="nb">frozenset</span><span class="p">([</span><span class="n">key</span><span class="p">])</span></div>
+
+<div class="viewcode-block" id="Ref.process"><a class="viewcode-back" href="../../core.html#tlang.core.Ref.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">cache</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">()</span>
+        <span class="k">return</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">cache</span><span class="p">)(</span><span class="n">context</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Wrapper"><a class="viewcode-back" href="../../core.html#tlang.core.Wrapper">[docs]</a><span class="k">class</span> <span class="nc">Wrapper</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+<div class="viewcode-block" id="Wrapper.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Wrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">read_context</span></div>
+
+<div class="viewcode-block" id="Wrapper.process"><a class="viewcode-back" href="../../core.html#tlang.core.Wrapper.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
+
+    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span><span class="n">f</span><span class="p">)))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+<div class="viewcode-block" id="Wrapper.visit"><a class="viewcode-back" href="../../core.html#tlang.core.Wrapper.visit">[docs]</a>    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Reset"><a class="viewcode-back" href="../../core.html#tlang.core.Reset">[docs]</a><span class="k">class</span> <span class="nc">Reset</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Surpress changes to context that effect keys outside of supplied</span>
+<span class="sd">    ``write_context``&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Reset.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Reset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">write_context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">write_context</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">write_context</span> <span class="o">=</span> <span class="n">write_context</span></div>
+
+<div class="viewcode-block" id="Reset.process"><a class="viewcode-back" href="../../core.html#tlang.core.Reset.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">original_context</span><span class="p">):</span>
+        <span class="n">masked</span> <span class="o">=</span> <span class="n">apply_mask</span><span class="p">(</span><span class="n">original_context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_context</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">original_context</span><span class="p">):</span>
+            <span class="n">pruned_modifications</span> <span class="o">=</span> <span class="n">diff</span><span class="p">(</span><span class="n">apply_mask</span><span class="p">(</span>
+                <span class="n">context</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_context</span><span class="p">),</span> <span class="n">masked</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">output</span><span class="p">,</span> <span class="n">merge</span><span class="p">(</span><span class="n">original_context</span><span class="p">,</span> <span class="n">pruned_modifications</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Named"><a class="viewcode-back" href="../../core.html#tlang.core.Named">[docs]</a><span class="k">class</span> <span class="nc">Named</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cache the output of each parse under the specified key&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Named.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Named.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">key</span> <span class="o">=</span> <span class="n">key</span></div>
+
+<div class="viewcode-block" id="Named.process"><a class="viewcode-back" href="../../core.html#tlang.core.Named.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">key</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Unique"><a class="viewcode-back" href="../../core.html#tlang.core.Unique">[docs]</a><span class="k">class</span> <span class="nc">Unique</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Discard results that share output tokens with a previous result.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Unique.process"><a class="viewcode-back" href="../../core.html#tlang.core.Unique.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="n">cache</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">parse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+            <span class="n">node</span><span class="p">,</span> <span class="n">key</span> <span class="o">=</span> <span class="n">parse</span>
+            <span class="k">if</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+                <span class="k">continue</span>
+            <span class="n">cache</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">node</span><span class="p">)</span>
+            <span class="k">yield</span> <span class="n">parse</span></div></div>
+
+
+<span class="nd">@transpiler</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">wild</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Wildcard character. Used to construct matches from positive/negative</span>
+<span class="sd">    lookaheads.&quot;&quot;&quot;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="k">yield</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+
+
+<div class="viewcode-block" id="Not"><a class="viewcode-back" href="../../core.html#tlang.core.Not">[docs]</a><span class="k">class</span> <span class="nc">Not</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Negative lookahead&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Not.process"><a class="viewcode-back" href="../../core.html#tlang.core.Not.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">return</span>
+        <span class="k">yield</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">context</span></div></div>
+
+
+<span class="n">nope</span> <span class="o">=</span> <span class="o">-</span><span class="n">null</span>
+
+
+<div class="viewcode-block" id="Combinator"><a class="viewcode-back" href="../../core.html#tlang.core.Combinator">[docs]</a><span class="k">class</span> <span class="nc">Combinator</span><span class="p">(</span><span class="n">Cached</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for combinators such as Alterations and Concatenations.</span>
+<span class="sd">    Combinators ultimately only involve two transpilers (left and right), but</span>
+<span class="sd">    binary trees can be built up in this manner.&quot;&quot;&quot;</span>
+
+    <span class="n">nil</span> <span class="o">=</span> <span class="n">null</span>
+
+<div class="viewcode-block" id="Combinator.new"><a class="viewcode-back" href="../../core.html#tlang.core.Combinator.new">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parsers</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">nil</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">parsers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">parsers</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Combinator.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Combinator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parsers</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parsers</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parsers</span> <span class="o">=</span> <span class="n">parsers</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">parsers</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">cls</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsers</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">left</span> <span class="o">=</span> <span class="n">parsers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">parsers</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">parsers</span><span class="p">)</span>
+                <span class="n">L</span> <span class="o">=</span> <span class="n">N</span> <span class="o">//</span> <span class="mi">2</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">parsers</span><span class="p">[:</span><span class="n">L</span><span class="p">],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">),</span> <span class="bp">cls</span><span class="p">(</span>
+                    <span class="n">parsers</span><span class="p">[</span><span class="n">L</span><span class="p">:],</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">read_context</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">read_context</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">read_context</span></div>
+
+    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span><span class="n">f</span><span class="p">))))</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+<div class="viewcode-block" id="Combinator.visit"><a class="viewcode-back" href="../../core.html#tlang.core.Combinator.visit">[docs]</a>    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Alteration"><a class="viewcode-back" href="../../core.html#tlang.core.Alteration">[docs]</a><span class="k">class</span> <span class="nc">Alteration</span><span class="p">(</span><span class="n">Combinator</span><span class="p">):</span>
+
+    <span class="n">nil</span> <span class="o">=</span> <span class="n">nope</span>
+
+<div class="viewcode-block" id="Alteration.process"><a class="viewcode-back" href="../../core.html#tlang.core.Alteration.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">,</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="n">infiniteloop</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">InfiniteLoop</span><span class="p">:</span>
+            <span class="n">infiniteloop</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">infiniteloop</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">InfiniteLoop</span><span class="p">:</span>
+                <span class="k">return</span></div></div>
+
+
+<div class="viewcode-block" id="PEGAlteration"><a class="viewcode-back" href="../../core.html#tlang.core.PEGAlteration">[docs]</a><span class="k">class</span> <span class="nc">PEGAlteration</span><span class="p">(</span><span class="n">Combinator</span><span class="p">):</span>
+
+    <span class="n">nil</span> <span class="o">=</span> <span class="n">nope</span>
+
+<div class="viewcode-block" id="PEGAlteration.process"><a class="viewcode-back" href="../../core.html#tlang.core.PEGAlteration.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">for</span> <span class="n">parse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">parse</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="n">found</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="typed"><a class="viewcode-back" href="../../core.html#tlang.core.typed">[docs]</a><span class="k">def</span> <span class="nf">typed</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Closure that applies single dispatch. Defautl</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        m (dict): hamt from classes to functions that should be applied to</span>
+<span class="sd">            inputs of that type.</span>
+<span class="sd">        default (callable): Function to be applied when input is not an</span>
+<span class="sd">            instance of any keys of ``m``.&quot;&quot;&quot;</span>
+    <span class="n">transform</span> <span class="o">=</span> <span class="n">_singledispatch</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">transform</span><span class="o">.</span><span class="n">register</span><span class="p">(</span><span class="n">t</span><span class="p">)(</span><span class="n">f</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">transform</span></div>
+
+
+<div class="viewcode-block" id="Sequential"><a class="viewcode-back" href="../../core.html#tlang.core.Sequential">[docs]</a><span class="k">class</span> <span class="nc">Sequential</span><span class="p">(</span><span class="n">Combinator</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Combinator that successively applies transpilers. This class combines</span>
+<span class="sd">    ambiguous parses of sucessive transpilers in a breadth first manner.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Sequential.process"><a class="viewcode-back" href="../../core.html#tlang.core.Sequential.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">roundrobin</span><span class="p">(</span><span class="n">_starmap</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">composition</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">context</span><span class="p">)))</span></div></div>
+
+
+<div class="viewcode-block" id="Concatenation"><a class="viewcode-back" href="../../core.html#tlang.core.Concatenation">[docs]</a><span class="k">class</span> <span class="nc">Concatenation</span><span class="p">(</span><span class="n">Sequential</span><span class="p">):</span>
+<div class="viewcode-block" id="Concatenation.composition"><a class="viewcode-back" href="../../core.html#tlang.core.Concatenation.composition">[docs]</a>    <span class="k">def</span> <span class="nf">composition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">tail</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">output</span> <span class="o">+</span> <span class="n">tail</span><span class="p">,</span> <span class="n">context</span></div></div>
+
+
+<div class="viewcode-block" id="Composed"><a class="viewcode-back" href="../../core.html#tlang.core.Composed">[docs]</a><span class="k">class</span> <span class="nc">Composed</span><span class="p">(</span><span class="n">Sequential</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Feeds the output of the first transpiler into the second. This output</span>
+<span class="sd">    includes context.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Composed.composition"><a class="viewcode-back" href="../../core.html#tlang.core.Composed.composition">[docs]</a>    <span class="k">def</span> <span class="nf">composition</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">output</span><span class="p">)):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]:</span>
+                <span class="k">yield</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="Completed"><a class="viewcode-back" href="../../core.html#tlang.core.Completed">[docs]</a><span class="k">class</span> <span class="nc">Completed</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Prune incomplete parses. Similar to ``run`` but as a full transpiler</span>
+<span class="sd">    that returns the (empty) string of remaining characters as well&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Completed.process"><a class="viewcode-back" href="../../core.html#tlang.core.Completed.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">tokens</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="k">for</span> <span class="n">parse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="o">=</span> <span class="n">parse</span>
+            <span class="k">if</span> <span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">parse</span></div></div>
+
+
+<div class="viewcode-block" id="Decache"><a class="viewcode-back" href="../../core.html#tlang.core.Decache">[docs]</a><span class="k">class</span> <span class="nc">Decache</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+<div class="viewcode-block" id="Decache.new"><a class="viewcode-back" href="../../core.html#tlang.core.Decache.new">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">new</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">parser</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">Cached</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">parser</span></div>
+
+<div class="viewcode-block" id="Decache.process"><a class="viewcode-back" href="../../core.html#tlang.core.Decache.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="decache"><a class="viewcode-back" href="../../core.html#tlang.core.decache">[docs]</a><span class="k">def</span> <span class="nf">decache</span><span class="p">(</span><span class="n">transpiler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove any usage of caches from transpiler. Useful for stochastically</span>
+<span class="sd">    generating elements of the transpiler&#39;s codomain&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">transpiler</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="n">Decache</span><span class="o">.</span><span class="n">new</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Placeholder"><a class="viewcode-back" href="../../core.html#tlang.core.Placeholder">[docs]</a><span class="k">class</span> <span class="nc">Placeholder</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Placeholder for transpiler that may not exist yet. Can be used to</span>
+<span class="sd">    generate recursive transpilers with ``recurrence``.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Placeholder.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Placeholder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">identifier</span> <span class="o">=</span> <span class="n">identifier</span></div></div>
+
+
+<div class="viewcode-block" id="Link"><a class="viewcode-back" href="../../core.html#tlang.core.Link">[docs]</a><span class="k">class</span> <span class="nc">Link</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reference transpiler in a possibly recursive fashion. Analagous to a</span>
+<span class="sd">    pointer in C or a link on a filesystem.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Link.set_parser"><a class="viewcode-back" href="../../core.html#tlang.core.Link.set_parser">[docs]</a>    <span class="k">def</span> <span class="nf">set_parser</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parser</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">parser</span></div>
+
+    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">_recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">prev</span> <span class="o">=</span> <span class="bp">self</span>
+        <span class="k">return</span> <span class="n">new</span>
+
+<div class="viewcode-block" id="Link.visit"><a class="viewcode-back" href="../../core.html#tlang.core.Link.visit">[docs]</a>    <span class="nd">@_lru_cache</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">visit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="n">f</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Link(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+
+
+<div class="viewcode-block" id="Greedy"><a class="viewcode-back" href="../../core.html#tlang.core.Greedy">[docs]</a><span class="k">class</span> <span class="nc">Greedy</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">,</span> <span class="n">Cached</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Greedy repetition. Returns longest of zero or more consecutive matches.</span>
+<span class="sd">    Non-recursive implementation. Consider decaching parser for maximum</span>
+<span class="sd">    performance.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Greedy.process"><a class="viewcode-back" href="../../core.html#tlang.core.Greedy.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">globbed_parses</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">globbed_parses</span><span class="p">:</span>
+                <span class="n">parses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">new_output</span><span class="p">,</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="n">parses</span><span class="p">:</span>
+                    <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">output</span> <span class="o">+</span> <span class="n">new_output</span><span class="p">,</span> <span class="n">new_context</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">new</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">globbed_parses</span>
+            <span class="n">globbed_parses</span> <span class="o">=</span> <span class="n">new</span></div></div>
+
+
+<div class="viewcode-block" id="Repetition"><a class="viewcode-back" href="../../core.html#tlang.core.Repetition">[docs]</a><span class="k">class</span> <span class="nc">Repetition</span><span class="p">(</span><span class="n">Wrapper</span><span class="p">,</span> <span class="n">Cached</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Returns zero or more consecutive matches. Non-recursive implementation.</span>
+<span class="sd">    Consider decaching parser for maximum performance.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Repetition.process"><a class="viewcode-back" href="../../core.html#tlang.core.Repetition.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">globbed_parses</span> <span class="o">=</span> <span class="p">[(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">context</span><span class="p">)]</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">new</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">globbed_parses</span><span class="p">:</span>
+                <span class="k">yield</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span>
+                <span class="n">parses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">new_output</span><span class="p">,</span> <span class="n">new_context</span> <span class="ow">in</span> <span class="n">parses</span><span class="p">:</span>
+                    <span class="n">new</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">output</span> <span class="o">+</span> <span class="n">new_output</span><span class="p">,</span> <span class="n">new_context</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">new</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">globbed_parses</span> <span class="o">=</span> <span class="n">new</span></div></div>
+
+
+<div class="viewcode-block" id="repetition"><a class="viewcode-back" href="../../core.html#tlang.core.repetition">[docs]</a><span class="k">def</span> <span class="nf">repetition</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Repetition of one or more consecutive matches. Recursive</span>
+<span class="sd">    implementation.&quot;&quot;&quot;</span>
+    <span class="n">ph</span> <span class="o">=</span> <span class="n">Placeholder</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="n">parser</span> <span class="o">+</span> <span class="o">~</span><span class="n">ph</span>
+    <span class="k">return</span> <span class="n">new</span><span class="o">.</span><span class="n">recurrence</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="greedy"><a class="viewcode-back" href="../../core.html#tlang.core.greedy">[docs]</a><span class="k">def</span> <span class="nf">greedy</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Longest of one or more consecutive matches. Recursive implementation.&quot;&quot;&quot;</span>
+    <span class="n">ph</span> <span class="o">=</span> <span class="n">Placeholder</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
+    <span class="n">new</span> <span class="o">=</span> <span class="n">parser</span> <span class="o">+</span> <span class="n">ph</span> <span class="o">/</span> <span class="n">null</span>
+    <span class="k">return</span> <span class="n">new</span><span class="o">.</span><span class="n">recurrence</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="contextfree"><a class="viewcode-back" href="../../core.html#tlang.core.contextfree">[docs]</a><span class="k">def</span> <span class="nf">contextfree</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Create a context free transpiler.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parser: Callable generator taking input string and generating tuples of</span>
+<span class="sd">            output strings and new input strings.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Transpiler&quot;&quot;&quot;</span>
+
+    <span class="nd">@transpiler</span><span class="p">()</span>
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">output</span><span class="p">,</span> <span class="n">tokens</span> <span class="ow">in</span> <span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">[</span><span class="s2">&quot;&quot;</span><span class="p">]):</span>
+            <span class="k">yield</span> <span class="n">output</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="contextonly"><a class="viewcode-back" href="../../core.html#tlang.core.contextonly">[docs]</a><span class="k">def</span> <span class="nf">contextonly</span><span class="p">(</span><span class="n">read_context</span><span class="o">=</span><span class="nb">frozenset</span><span class="p">([</span><span class="s2">&quot;&quot;</span><span class="p">])):</span>
+    <span class="sd">&quot;&quot;&quot;Create a transpiler that manipulates context while returning an empty</span>
+<span class="sd">    output string.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        parser: Callable generator taking and yielding a context object.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Transpiler&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">wrapper</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+        <span class="nd">@transpiler</span><span class="p">(</span><span class="n">read_context</span><span class="p">)</span>
+        <span class="k">def</span> <span class="nf">_</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">context</span> <span class="ow">in</span> <span class="n">parser</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">context</span>
+
+        <span class="k">return</span> <span class="n">_</span>
+
+    <span class="k">return</span> <span class="n">wrapper</span></div>
+
+
+<div class="viewcode-block" id="oneof"><a class="viewcode-back" href="../../core.html#tlang.core.oneof">[docs]</a><span class="k">def</span> <span class="nf">oneof</span><span class="p">(</span><span class="n">strings</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Match one string from a collection</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        strings (iterable): Iterable of strings</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        PEGAlteration of supplied strings&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">PEGAlteration</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">Terminal</span><span class="p">,</span> <span class="nb">frozenset</span><span class="p">(</span><span class="n">strings</span><span class="p">))))</span></div>
+
+
+<span class="n">lower_case</span> <span class="o">=</span> <span class="n">oneof</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_lowercase</span><span class="p">)</span>
+<span class="n">upper_case</span> <span class="o">=</span> <span class="n">oneof</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">ascii_uppercase</span><span class="p">)</span>
+<span class="n">letter</span> <span class="o">=</span> <span class="n">lower_case</span> <span class="o">/</span> <span class="n">upper_case</span>
+<span class="n">digit</span> <span class="o">=</span> <span class="n">oneof</span><span class="p">(</span><span class="n">string</span><span class="o">.</span><span class="n">digits</span><span class="p">)</span>
+<span class="n">alphanum</span> <span class="o">=</span> <span class="n">letter</span> <span class="o">/</span> <span class="n">digit</span>
+
+
+<div class="viewcode-block" id="within"><a class="viewcode-back" href="../../core.html#tlang.core.within">[docs]</a><span class="k">def</span> <span class="nf">within</span><span class="p">(</span><span class="n">needle</span><span class="p">,</span> <span class="n">haystack</span><span class="p">,</span> <span class="n">sep</span><span class="p">):</span>
+    <span class="n">common</span> <span class="o">=</span> <span class="p">(</span><span class="n">haystack</span> <span class="o">+</span> <span class="n">sep</span><span class="p">)[:]</span> <span class="o">+</span> <span class="n">haystack</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">common</span> <span class="o">+</span> <span class="p">(</span><span class="n">sep</span> <span class="o">+</span> <span class="n">needle</span><span class="p">)</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">f</span> <span class="o">+</span> <span class="o">~</span><span class="p">(</span><span class="n">sep</span> <span class="o">+</span> <span class="n">common</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">needle</span> <span class="o">+</span> <span class="n">sep</span><span class="p">)</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">+</span> <span class="n">common</span></div>
+
+
+<div class="viewcode-block" id="both_within"><a class="viewcode-back" href="../../core.html#tlang.core.both_within">[docs]</a><span class="k">def</span> <span class="nf">both_within</span><span class="p">(</span>
+    <span class="n">needle1</span><span class="p">,</span> <span class="n">needle2</span><span class="p">,</span> <span class="n">haystack</span><span class="p">,</span> <span class="n">sep</span><span class="p">,</span> <span class="n">template1</span><span class="p">,</span> <span class="n">template2</span><span class="p">,</span> <span class="n">commutative</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">):</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="n">within</span><span class="p">(</span><span class="n">needle1</span><span class="p">,</span> <span class="n">haystack</span><span class="p">,</span> <span class="n">sep</span><span class="p">)</span>
+    <span class="n">b</span> <span class="o">=</span> <span class="n">within</span><span class="p">(</span><span class="n">needle2</span><span class="p">,</span> <span class="n">haystack</span><span class="p">,</span> <span class="n">sep</span><span class="p">)</span>
+    <span class="n">found</span> <span class="o">=</span> <span class="n">a</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">b</span>
+    <span class="n">just_needles</span> <span class="o">=</span> <span class="n">needle1</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">needle2</span>
+    <span class="k">if</span> <span class="n">commutative</span><span class="p">:</span>
+        <span class="n">found</span> <span class="o">|=</span> <span class="n">b</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">a</span>
+        <span class="n">just_needles</span> <span class="o">|=</span> <span class="n">needle2</span> <span class="o">+</span> <span class="n">sep</span> <span class="o">+</span> <span class="n">needle1</span>
+    <span class="k">return</span> <span class="n">just_needles</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="n">template2</span><span class="p">)</span> <span class="o">|</span> <span class="n">found</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="n">template1</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="delimeted"><a class="viewcode-back" href="../../core.html#tlang.core.delimeted">[docs]</a><span class="k">def</span> <span class="nf">delimeted</span><span class="p">(</span><span class="n">transpiler</span><span class="p">,</span> <span class="n">delimeter</span><span class="p">,</span> <span class="n">greedy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">cache</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+    <span class="n">delimeter</span> <span class="o">+=</span> <span class="n">transpiler</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">cache</span><span class="p">:</span>
+        <span class="n">delimeter</span> <span class="o">=</span> <span class="n">decache</span><span class="p">(</span><span class="n">delimeter</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">greedy</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">transpiler</span> <span class="o">+</span> <span class="n">Greedy</span><span class="p">(</span><span class="n">delimeter</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">transpiler</span> <span class="o">+</span> <span class="n">delimeter</span><span class="p">[:]</span></div>
+
+
+<div class="viewcode-block" id="test"><a class="viewcode-back" href="../../core.html#tlang.core.test">[docs]</a><span class="k">def</span> <span class="nf">test</span><span class="p">(</span><span class="n">transpiler</span><span class="p">,</span> <span class="n">tests</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Convience function for running test cases.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        transpiler (Transpiler): Transpiler instance to test.</span>
+<span class="sd">        tests (dict): hamt from input string to list of expected output strings.</span>
+<span class="sd">        context (hamt): Context to use as input. Defaults to ``None``,</span>
+<span class="sd">            specifying the default initial context of the transpiler.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        ``None``&quot;&quot;&quot;</span>
+
+    <span class="k">for</span> <span class="n">input_string</span><span class="p">,</span> <span class="n">output_strings</span> <span class="ow">in</span> <span class="n">tests</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">test_out</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">transpiler</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="n">context</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">test_out</span> <span class="o">==</span> <span class="n">output_strings</span>
+        <span class="k">except</span> <span class="ne">AssertionError</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;output&quot;</span><span class="p">,</span> <span class="n">test_out</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;expected&quot;</span><span class="p">,</span> <span class="n">output_strings</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alex Eftimiades.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

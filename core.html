@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>core &mdash; tlang 0.0.2 documentation</title>
+      <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Introduction" href="introduction.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+            <a href="index.html" class="icon icon-home"> tlang
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="introduction.html">Introduction</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">core</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">tlang</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+      <li>core</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/core.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tlang.core">
+<span id="core"></span><h1>core<a class="headerlink" href="#module-tlang.core" title="Permalink to this headline"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Alteration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Alteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Alteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Alteration" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Combinator" title="tlang.core.Combinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Combinator</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tlang.core.Alteration.nil">
+<span class="sig-name descname"><span class="pre">nil</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Not(Terminal(''))</span></em><a class="headerlink" href="#tlang.core.Alteration.nil" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Alteration.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reverse</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Alteration.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Alteration.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Anything">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Anything</span></span><a class="reference internal" href="_modules/tlang/core.html#Anything"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Anything" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Behaves like a context object that contains everything. Use as leaf node
+for masks.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Cached">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Cached</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Cached"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Cached" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<p>Base class for cached transpilers.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Cached.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Cached.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Cached.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Parse, cache, yield, gaurd for infinite loops.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Cached.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Cached.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Cached.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Cached.cache_process">
+<span class="sig-name descname"><span class="pre">cache_process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parses</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Cached.cache_process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Cached.cache_process" title="Permalink to this definition"></a></dt>
+<dd><p>Iterate over parses, caching them before yielding</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Cached.return_cache">
+<span class="sig-name descname"><span class="pre">return_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">cache_key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Cached.return_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Cached.return_cache" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Combinator">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Combinator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Combinator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Combinator" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Cached" title="tlang.core.Cached"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Cached</span></code></a></p>
+<p>Base class for combinators such as Alterations and Concatenations.
+Combinators ultimately only involve two transpilers (left and right), but
+binary trees can be built up in this manner.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Combinator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Combinator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Combinator.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Combinator.new">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Combinator.new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Combinator.new" title="Permalink to this definition"></a></dt>
+<dd><p>Like <code class="docutils literal notranslate"><span class="pre">__new__</span></code> but doesn’t trigger <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.  Useful for
+bailing out of creating new instances when it wouldn’t make sense to do
+so.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tlang.core.Combinator.nil">
+<span class="sig-name descname"><span class="pre">nil</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Terminal('')</span></em><a class="headerlink" href="#tlang.core.Combinator.nil" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Combinator.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Combinator.visit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Combinator.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Like recur but don’t build anything new. Just apply the function to
+each transpiler that comprise this one</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Completed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Completed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Completed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Completed" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<p>Prune incomplete parses. Similar to <code class="docutils literal notranslate"><span class="pre">run</span></code> but as a full transpiler
+that returns the (empty) string of remaining characters as well</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Completed.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Completed.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Completed.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Composed">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Composed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Composed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Composed" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Sequential" title="tlang.core.Sequential"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Sequential</span></code></a></p>
+<p>Feeds the output of the first transpiler into the second. This output
+includes context.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Composed.composition">
+<span class="sig-name descname"><span class="pre">composition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Composed.composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Composed.composition" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Concatenation">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Concatenation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Concatenation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Concatenation" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Sequential" title="tlang.core.Sequential"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Sequential</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Concatenation.composition">
+<span class="sig-name descname"><span class="pre">composition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">output</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Concatenation.composition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Concatenation.composition" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Decache">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Decache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Decache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Decache" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Decache.new">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Decache.new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Decache.new" title="Permalink to this definition"></a></dt>
+<dd><p>Like <code class="docutils literal notranslate"><span class="pre">__new__</span></code> but doesn’t trigger <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.  Useful for
+bailing out of creating new instances when it wouldn’t make sense to do
+so.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Decache.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Decache.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Decache.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.FromProcessor">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">FromProcessor</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_context</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#FromProcessor"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.FromProcessor" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<p>Create a transpiler from a callable generator.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>processor</strong> (<em>generator</em>) – Callable parser taking context and returning
+tuple of output and context.</p></li>
+<li><p><strong>read_context</strong> (<em>frozenset</em>) – read_context of parser</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transpiler instance</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.FromProcessor.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">processor</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">read_context</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#FromProcessor.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.FromProcessor.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.FromProcessor.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#FromProcessor.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.FromProcessor.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Greedy">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Greedy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Greedy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Greedy" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a>, <a class="reference internal" href="#tlang.core.Cached" title="tlang.core.Cached"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Cached</span></code></a></p>
+<p>Greedy repetition. Returns longest of zero or more consecutive matches.
+Non-recursive implementation. Consider decaching parser for maximum
+performance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Greedy.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Greedy.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Greedy.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="tlang.core.InfiniteLoop">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">InfiniteLoop</span></span><a class="reference internal" href="_modules/tlang/core.html#InfiniteLoop"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.InfiniteLoop" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Link">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Link" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<p>Reference transpiler in a possibly recursive fashion. Analagous to a
+pointer in C or a link on a filesystem.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Link.set_parser">
+<span class="sig-name descname"><span class="pre">set_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Link.set_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Link.set_parser" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Link.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Link.visit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Link.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Like recur but don’t build anything new. Just apply the function to
+each transpiler that comprise this one</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Named">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Named</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Named"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Named" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<p>Cache the output of each parse under the specified key</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Named.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Named.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Named.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Named.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Named.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Named.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Not">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Not</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Not"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Not" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<p>Negative lookahead</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Not.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Not.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Not.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.PEGAlteration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">PEGAlteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#PEGAlteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.PEGAlteration" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Combinator" title="tlang.core.Combinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Combinator</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tlang.core.PEGAlteration.nil">
+<span class="sig-name descname"><span class="pre">nil</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Not(Terminal(''))</span></em><a class="headerlink" href="#tlang.core.PEGAlteration.nil" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.PEGAlteration.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#PEGAlteration.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.PEGAlteration.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Placeholder">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Placeholder</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Placeholder"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Placeholder" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<p>Placeholder for transpiler that may not exist yet. Can be used to
+generate recursive transpilers with <code class="docutils literal notranslate"><span class="pre">recurrence</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Placeholder.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Placeholder.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Placeholder.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Ref">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Ref" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<p>Match the exact output of a transpiler referenced by name. Scoped
+references are specified with scopes separated by <code class="docutils literal notranslate"><span class="pre">.</span></code>.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Ref.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Ref.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Ref.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Ref.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Ref.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Ref.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Repetition">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Repetition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Repetition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Repetition" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a>, <a class="reference internal" href="#tlang.core.Cached" title="tlang.core.Cached"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Cached</span></code></a></p>
+<p>Returns zero or more consecutive matches. Non-recursive implementation.
+Consider decaching parser for maximum performance.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Repetition.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Repetition.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Repetition.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Reset">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_context</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Reset" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<p>Surpress changes to context that effect keys outside of supplied
+<code class="docutils literal notranslate"><span class="pre">write_context</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Reset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">write_context</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Reset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Reset.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Reset.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">original_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Reset.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Reset.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Sequential">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Sequential</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Sequential"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Sequential" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Combinator" title="tlang.core.Combinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Combinator</span></code></a></p>
+<p>Combinator that successively applies transpilers. This class combines
+ambiguous parses of sucessive transpilers in a breadth first manner.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Sequential.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Sequential.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Sequential.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Template">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ldelim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdelim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'}'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Template" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<p>Template generated from concatenation of partitions (str) interleaved with the
+result of fetching caches from context using keys.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Template.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ldelim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdelim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'}'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Template.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Template.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Template.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Template.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Template.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Terminal">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Terminal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Terminal.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal.__add__" title="Permalink to this definition"></a></dt>
+<dd><p>Concatenation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Terminal.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Terminal.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Transpiler">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Transpiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__add__">
+<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.__add__" title="Permalink to this definition"></a></dt>
+<dd><p>Concatenation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__call__">
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.__call__" title="Permalink to this definition"></a></dt>
+<dd><p>Call self as a function.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">slice_key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.__getitem__" title="Permalink to this definition"></a></dt>
+<dd><p>Repetition</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__invert__">
+<span class="sig-name descname"><span class="pre">__invert__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.__invert__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.__invert__" title="Permalink to this definition"></a></dt>
+<dd><p>Optional</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__mul__">
+<span class="sig-name descname"><span class="pre">__mul__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tlang.core.Transpiler.__mul__" title="Permalink to this definition"></a></dt>
+<dd><p>Feed output of this transpiler into input of another transpiler.
+Remember incomplete parses are fed through too!</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.__neg__">
+<span class="sig-name descname"><span class="pre">__neg__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.__neg__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.__neg__" title="Permalink to this definition"></a></dt>
+<dd><p>Negative lookahead</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.comp">
+<span class="sig-name descname"><span class="pre">comp</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.comp"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.comp" title="Permalink to this definition"></a></dt>
+<dd><p>Feed output of this transpiler into input of another transpiler.
+Remember incomplete parses are fed through too!</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.compT">
+<span class="sig-name descname"><span class="pre">compT</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ldelim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'{'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rdelim</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'}'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'__output__'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.compT"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.compT" title="Permalink to this definition"></a></dt>
+<dd><p>Construct a <code class="docutils literal notranslate"><span class="pre">Template</span></code> and compose this parser with it.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.complete">
+<span class="sig-name descname"><span class="pre">complete</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.complete"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.complete" title="Permalink to this definition"></a></dt>
+<dd><p>Return only complete parses. Useful for composing otherwise
+independent transformations without passing incomplete transformations
+through.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.copy">
+<span class="sig-name descname"><span class="pre">copy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">new_args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">new_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.copy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.copy" title="Permalink to this definition"></a></dt>
+<dd><p>Recreat this object using the args and kwargs that generated it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>*new_args</strong> – New arguments with which to update the ones originally
+used to create this object.</p></li>
+<li><p><strong>**new_kwargs</strong> – New keyword arguments with which to update the ones
+originally used to create this object.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Copy of self with specified alterations</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.get_init_context">
+<span class="sig-name descname"><span class="pre">get_init_context</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.get_init_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.get_init_context" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.inv">
+<span class="sig-name descname"><span class="pre">inv</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.inv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.inv" title="Permalink to this definition"></a></dt>
+<dd><p>Negative lookahead plus wildcard character</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.new">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">new</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.new"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.new" title="Permalink to this definition"></a></dt>
+<dd><p>Like <code class="docutils literal notranslate"><span class="pre">__new__</span></code> but doesn’t trigger <code class="docutils literal notranslate"><span class="pre">__init__</span></code>.  Useful for
+bailing out of creating new instances when it wouldn’t make sense to do
+so.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.recur">
+<span class="sig-name descname"><span class="pre">recur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.recur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.recur" title="Permalink to this definition"></a></dt>
+<dd><p>Build a new transpiler from the result of recursively applying a
+function to all the transpilers that comprise this one.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.recurrence">
+<span class="sig-name descname"><span class="pre">recurrence</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.recurrence"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.recurrence" title="Permalink to this definition"></a></dt>
+<dd><p>Create a copy and replace any <code class="docutils literal notranslate"><span class="pre">Placeholder</span></code> with identifier
+<code class="docutils literal notranslate"><span class="pre">identifier</span></code> with self reference. Return the modified copy</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.ref">
+<span class="sig-name descname"><span class="pre">ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.ref" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">write_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">frozenset({''})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.reset" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.run">
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.run" title="Permalink to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Transpile text, returning only output strings (optionally with final</dt><dd><p>context) of complete parses.</p>
+</dd>
+</dl>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text</strong> (<em>string</em><em> or </em><em>None</em>) – input sting</p></li>
+<li><p><strong>context</strong> – Context object or None for default context object of instance</p></li>
+<li><p><strong>return_context</strong> (<em>bool</em>) – Return final context in addition to ouput strings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of output strings of complete parses. If
+<code class="docutils literal notranslate"><span class="pre">return_context=True</span></code> then generate tuples with output string and
+final context.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.set_init_context">
+<span class="sig-name descname"><span class="pre">set_init_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">init_context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.set_init_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.set_init_context" title="Permalink to this definition"></a></dt>
+<dd><p>Override to change context object used for <code class="docutils literal notranslate"><span class="pre">run</span></code></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>init_context</strong> (<em>dict-like</em>) – default context</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Transpiler.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.visit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Like recur but don’t build anything new. Just apply the function to
+each transpiler that comprise this one</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Unique">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Unique</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Unique"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Unique" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
+<p>Discard results that share output tokens with a previous result.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Unique.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Unique.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Unique.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.Wrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Wrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Wrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Wrapper" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Wrapper.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Wrapper.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Wrapper.__init__" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Wrapper.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Wrapper.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Wrapper.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.Wrapper.visit">
+<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Wrapper.visit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Wrapper.visit" title="Permalink to this definition"></a></dt>
+<dd><p>Like recur but don’t build anything new. Just apply the function to
+each transpiler that comprise this one</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.apply_mask">
+<span class="sig-name descname"><span class="pre">apply_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#apply_mask"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.apply_mask" title="Permalink to this definition"></a></dt>
+<dd><p>Apply mask.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.both_within">
+<span class="sig-name descname"><span class="pre">both_within</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">needle1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">needle2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">haystack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commutative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#both_within"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.both_within" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.clear_visit_cache">
+<span class="sig-name descname"><span class="pre">clear_visit_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#clear_visit_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.clear_visit_cache" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.contextfree">
+<span class="sig-name descname"><span class="pre">contextfree</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#contextfree"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.contextfree" title="Permalink to this definition"></a></dt>
+<dd><p>Create a context free transpiler.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> – Callable generator taking input string and generating tuples of
+output strings and new input strings.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transpiler</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.contextonly">
+<span class="sig-name descname"><span class="pre">contextonly</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">frozenset({''})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#contextonly"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.contextonly" title="Permalink to this definition"></a></dt>
+<dd><p>Create a transpiler that manipulates context while returning an empty
+output string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>parser</strong> – Callable generator taking and yielding a context object.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Transpiler</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.decache">
+<span class="sig-name descname"><span class="pre">decache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transpiler</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#decache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.decache" title="Permalink to this definition"></a></dt>
+<dd><p>Remove any usage of caches from transpiler. Useful for stochastically
+generating elements of the transpiler’s codomain</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.delimeted">
+<span class="sig-name descname"><span class="pre">delimeted</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transpiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delimeter</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">greedy</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#delimeted"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.delimeted" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.diff">
+<span class="sig-name descname"><span class="pre">diff</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">new</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">initial</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#diff"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.diff" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.find_transformations">
+<span class="sig-name descname"><span class="pre">find_transformations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#find_transformations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.find_transformations" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.get_scoped">
+<span class="sig-name descname"><span class="pre">get_scoped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#get_scoped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.get_scoped" title="Permalink to this definition"></a></dt>
+<dd><p>Retrieve an entry from a nested HAMT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – HAMT</p></li>
+<li><p><strong>keys</strong> – iterable of nested keys</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HAMT</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.greedy">
+<span class="sig-name descname"><span class="pre">greedy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#greedy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.greedy" title="Permalink to this definition"></a></dt>
+<dd><p>Longest of one or more consecutive matches. Recursive implementation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.merge">
+<span class="sig-name descname"><span class="pre">merge</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">modifications</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#merge"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.merge" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.oneof">
+<span class="sig-name descname"><span class="pre">oneof</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">strings</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#oneof"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.oneof" title="Permalink to this definition"></a></dt>
+<dd><p>Match one string from a collection</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>strings</strong> (<em>iterable</em>) – Iterable of strings</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>PEGAlteration of supplied strings</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.repetition">
+<span class="sig-name descname"><span class="pre">repetition</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#repetition"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.repetition" title="Permalink to this definition"></a></dt>
+<dd><p>Repetition of one or more consecutive matches. Recursive
+implementation.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.reset" title="Permalink to this definition"></a></dt>
+<dd><p>Reinitialize all transpilers that comprise its argument until none of
+those transpilers’ read and write contexts change.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.roundrobin">
+<span class="sig-name descname"><span class="pre">roundrobin</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">iterables</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#roundrobin"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.roundrobin" title="Permalink to this definition"></a></dt>
+<dd><p>roundrobin((‘ABC’, ‘D’, ‘EF’)) –&gt; ‘A’ ‘D’ ‘E’ ‘B’ ‘F’ ‘C’</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.set_scoped">
+<span class="sig-name descname"><span class="pre">set_scoped</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">value</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#set_scoped"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.set_scoped" title="Permalink to this definition"></a></dt>
+<dd><p>Create or modify an entry of nested HAMTs.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>context</strong> – HAMT</p></li>
+<li><p><strong>keys</strong> – iterable of nested keys</p></li>
+<li><p><strong>value</strong> – leaf value to set at context[key[0]][key[1]]…</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>HAMT</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.stitch">
+<span class="sig-name descname"><span class="pre">stitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#stitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.stitch" title="Permalink to this definition"></a></dt>
+<dd><p>Stitch transpilers by reference, replacing Placeholders with Links.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>lookup</strong> – hamt from placeholder identifiers to parsers</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>hamt from placeholder identifiers to properly linked parsers</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.test">
+<span class="sig-name descname"><span class="pre">test</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transpiler</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tests</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#test"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.test" title="Permalink to this definition"></a></dt>
+<dd><p>Convience function for running test cases.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>transpiler</strong> (<a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><em>Transpiler</em></a>) – Transpiler instance to test.</p></li>
+<li><p><strong>tests</strong> (<em>dict</em>) – hamt from input string to list of expected output strings.</p></li>
+<li><p><strong>context</strong> (<em>hamt</em>) – Context to use as input. Defaults to <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+specifying the default initial context of the transpiler.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.transpiler">
+<span class="sig-name descname"><span class="pre">transpiler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">read_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">frozenset({''})</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#transpiler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.transpiler" title="Permalink to this definition"></a></dt>
+<dd><p>Acts as decorator for quickly writing custom transpilers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>read_context</strong> (<em>iterable</em>) – read_context of transpiler</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Wrapper that returns a <code class="docutils literal notranslate"><span class="pre">UserDefined</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>callable</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.typed">
+<span class="sig-name descname"><span class="pre">typed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">m</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">default=&lt;function</span> <span class="pre">&lt;lambda&gt;&gt;</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#typed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.typed" title="Permalink to this definition"></a></dt>
+<dd><p>Closure that applies single dispatch. Defautl</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>m</strong> (<em>dict</em>) – hamt from classes to functions that should be applied to
+inputs of that type.</p></li>
+<li><p><strong>default</strong> (<em>callable</em>) – Function to be applied when input is not an
+instance of any keys of <code class="docutils literal notranslate"><span class="pre">m</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.update_links">
+<span class="sig-name descname"><span class="pre">update_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#update_links"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.update_links" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tlang.core.within">
+<span class="sig-name descname"><span class="pre">within</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">needle</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">haystack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#within"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.within" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="introduction.html" class="btn btn-neutral float-left" title="Introduction" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2022, Alex Eftimiades.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
