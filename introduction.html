@@ -93,7 +93,7 @@ however Tlang differs in its goals and implementation.</p>
 parsing by allowing parsers to compose. The underlying parser is probably best
 described as a scannerless context sensitive packrat parser that handles left
 recursion and ambiguity. Rather than returning one parse, parsers return
-generators. Alterations catch an <code class="xref py py-class docutils literal notranslate"><span class="pre">InfiniteLoop</span></code> exception and reverse
+generators. Alterations catch an <a class="reference internal" href="core.html#tlang.core.InfiniteLoop" title="tlang.core.InfiniteLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">InfiniteLoop</span></code></a> exception and reverse
 the order of their branches accordingly. The parser essentially reduces to a
 packrat parser for PEG grammars.</p>
 <p>Tlang defines a parser as a map from a context object (in our case a <a class="reference external" href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">Hash
@@ -160,9 +160,9 @@ concatenations.</p>
 []
 </pre></div>
 </div>
-<p>There is a subtly however. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code> only returns <em>complete</em> parses that
+<p>There is a subtly however. <a class="reference internal" href="core.html#tlang.core.Transpiler.run" title="tlang.core.Transpiler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code></a> only returns <em>complete</em> parses that
 transform the entire input string. Under the hood, <code class="docutils literal notranslate"><span class="pre">select</span></code> actually matches
-the string <code class="docutils literal notranslate"><span class="pre">&quot;select&quot;</span></code> from the beginning of its input. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code>
+the string <code class="docutils literal notranslate"><span class="pre">&quot;select&quot;</span></code> from the beginning of its input. <a class="reference internal" href="core.html#tlang.core.Transpiler.run" title="tlang.core.Transpiler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code></a>
 just eliminates transforms that haven’t been applied to the entire string. You
 can see this by calling it.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
@@ -262,7 +262,7 @@ of repetitions, and the step size specifies the same.</p>
 <p>Repetitions can be recursive or loopy, and greedy or not. All have
 advantages and disadvantages. List comprehension implements loopy non-greedy
 repetition. You can access the API for the four implementations directly at
-<code class="xref py py-class docutils literal notranslate"><span class="pre">Repetition</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">Greedy</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">repetition()</span></code>, <code class="xref py py-func docutils literal notranslate"><span class="pre">greedy()</span></code>.
+<a class="reference internal" href="core.html#tlang.core.Repetition" title="tlang.core.Repetition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repetition</span></code></a>, <a class="reference internal" href="core.html#tlang.core.Greedy" title="tlang.core.Greedy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Greedy</span></code></a>, <a class="reference internal" href="core.html#tlang.core.repetition" title="tlang.core.repetition"><code class="xref py py-func docutils literal notranslate"><span class="pre">repetition()</span></code></a>, <a class="reference internal" href="core.html#tlang.core.greedy" title="tlang.core.greedy"><code class="xref py py-func docutils literal notranslate"><span class="pre">greedy()</span></code></a>.
 For maximum performance on long repetitions, apply <cite>decache</cite> to remove any
 caching from the parser to be repeated before creating the repetition.</p>
 </div>
@@ -314,7 +314,7 @@ used to specify a superset of <a class="reference external" href="https://en.wik
 <section id="templates-and-references">
 <h2>Templates and References<a class="headerlink" href="#templates-and-references" title="Permalink to this headline"></a></h2>
 <p>To make use of this concept for transpilation, we introduce our first context
-sensitive parser: the <code class="xref py py-class docutils literal notranslate"><span class="pre">Template</span></code>.</p>
+sensitive parser: the <a class="reference internal" href="core.html#tlang.core.Template" title="tlang.core.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">Template</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
 <span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span>
 
@@ -386,10 +386,10 @@ nonexistant key is referenced from the context.</p>
 []
 </pre></div>
 </div>
-<p>Composition with Templates is common enough we included <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.compT()</span></code>
+<p>Composition with Templates is common enough we included <a class="reference internal" href="core.html#tlang.core.Transpiler.compT" title="tlang.core.Transpiler.compT"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.compT()</span></code></a>
 as a shortcut. Note that empty delimiters denote the text passed to the
 template since the context key for the input string is an empty string.</p>
-<p>You can parse exact matches of the results of previous parses with <code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code>.</p>
+<p>You can parse exact matches of the results of previous parses with <a class="reference internal" href="core.html#tlang.core.Ref" title="tlang.core.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
 
 <span class="n">variable</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">)</span> <span class="o">|</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">)</span>
@@ -452,8 +452,8 @@ different dialect. You probably have a lot of lines that are just fine with one
 or two rules that need to be changed to something else.  You could write a
 function or class that can return a transpiler for either option, but do you
 really want to refactor that function every time you come up with a slightly
-different use case? Tlang transpilers come with a <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.recur()</span></code>
-method for this scenario. <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.recur()</span></code> will recursively apply a
+different use case? Tlang transpilers come with a <a class="reference internal" href="core.html#tlang.core.Transpiler.recur" title="tlang.core.Transpiler.recur"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.recur()</span></code></a>
+method for this scenario. <a class="reference internal" href="core.html#tlang.core.Transpiler.recur" title="tlang.core.Transpiler.recur"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.recur()</span></code></a> will recursively apply a
 function to each component of your transpiler, building a modified copy from
 the ground up.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
@@ -496,7 +496,7 @@ the ground up.</p>
 [&#39;{&quot;key&quot;: (&quot;value&quot;, 3, 2)}&#39;]
 </pre></div>
 </div>
-<p>Tlang also provides a <code class="xref py py-func docutils literal notranslate"><span class="pre">typed()</span></code> convenience method for generating single
+<p>Tlang also provides a <a class="reference internal" href="core.html#tlang.core.typed" title="tlang.core.typed"><code class="xref py py-func docutils literal notranslate"><span class="pre">typed()</span></code></a> convenience method for generating single
 dispatch functions. As another example, consider swapping concatenations for
 alterations.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
@@ -562,7 +562,7 @@ are or behave like <code class="docutils literal notranslate"><span class="pre">
 </pre></div>
 </div>
 <p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
-(e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Combinator</span></code> instances) will attempt to cache their operations.
+(e.g. <a class="reference internal" href="core.html#tlang.core.Combinator" title="tlang.core.Combinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Combinator</span></code></a> instances) will attempt to cache their operations.
 These transpilers use their read_context in conjunction with the context it
 receives to derive a key for its own cache. They likewise derive the piece of
 output context stored within the cache from the write_context. This is
@@ -571,7 +571,7 @@ a true execution.</p>
 <p>Combinators (like alterations, concatenations, and compositions) effectively
 union child <code class="docutils literal notranslate"><span class="pre">read_context</span></code> attributes since caching them needs to cover all
 possibilities of their child parsers.</p>
-<p><code class="xref py py-class docutils literal notranslate"><span class="pre">Anything</span></code> is a class that implements just enough <code class="docutils literal notranslate"><span class="pre">frozenset</span></code> methods
+<p><a class="reference internal" href="core.html#tlang.core.Anything" title="tlang.core.Anything"><code class="xref py py-class docutils literal notranslate"><span class="pre">Anything</span></code></a> is a class that implements just enough <code class="docutils literal notranslate"><span class="pre">frozenset</span></code> methods
 to act like it stores everything. Kind of like <code class="docutils literal notranslate"><span class="pre">nan</span></code> in floating point
 arithmetic.</p>
 <section id="cache-sharing">
@@ -589,7 +589,7 @@ covered. But once you start iterating over de Morgan’s laws to switch between
 <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">|</span> <span class="pre">(b</span> <span class="pre">+</span> <span class="pre">c)</span></code> and <code class="docutils literal notranslate"><span class="pre">(a</span> <span class="pre">|</span> <span class="pre">b)</span> <span class="pre">+</span> <span class="pre">(a</span> <span class="pre">|</span> <span class="pre">c)</span></code>,  you have to start asking <em>which</em>
 caches you want to share. There may be multiple options if <code class="docutils literal notranslate"><span class="pre">b</span> <span class="pre">+</span> <span class="pre">c</span></code> and
 <code class="docutils literal notranslate"><span class="pre">a</span> <span class="pre">|</span> <span class="pre">b</span></code> both exist elsewhere in isolation! We do hope to build out a series
-of optimization passes for this kind of thing using <code class="xref py py-class docutils literal notranslate"><span class="pre">Transpiler.recur</span></code>
+of optimization passes for this kind of thing using <a class="reference internal" href="core.html#tlang.core.Transpiler.recur" title="tlang.core.Transpiler.recur"><code class="xref py py-class docutils literal notranslate"><span class="pre">Transpiler.recur</span></code></a>
 in the future, but for now we consider it premature optimization for the
 project roadmap.</p>
 <p>In the mean time, reusing variables goes a long way to overcome this issue and
@@ -614,13 +614,13 @@ Enter the following decorators.</p>
 <div class="topic">
 <p class="topic-title">One off decorators</p>
 <ul class="simple">
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code> for general transpilers</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">contextonly()</span></code> for transpilers that output the empty string</p></li>
-<li><p><code class="xref py py-func docutils literal notranslate"><span class="pre">contextfree()</span></code> for transpilers that only read the input string</p></li>
+<li><p><a class="reference internal" href="core.html#tlang.core.transpiler" title="tlang.core.transpiler"><code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code></a> for general transpilers</p></li>
+<li><p><a class="reference internal" href="core.html#tlang.core.contextonly" title="tlang.core.contextonly"><code class="xref py py-func docutils literal notranslate"><span class="pre">contextonly()</span></code></a> for transpilers that output the empty string</p></li>
+<li><p><a class="reference internal" href="core.html#tlang.core.contextfree" title="tlang.core.contextfree"><code class="xref py py-func docutils literal notranslate"><span class="pre">contextfree()</span></code></a> for transpilers that only read the input string</p></li>
 </ul>
 </div>
-<p>You can use <code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code> for anything you can use <code class="xref py py-func docutils literal notranslate"><span class="pre">contextonly()</span></code>
-and <code class="xref py py-func docutils literal notranslate"><span class="pre">contextfree()</span></code> for, but the latter make their respective use cases
+<p>You can use <a class="reference internal" href="core.html#tlang.core.transpiler" title="tlang.core.transpiler"><code class="xref py py-func docutils literal notranslate"><span class="pre">transpiler()</span></code></a> for anything you can use <a class="reference internal" href="core.html#tlang.core.contextonly" title="tlang.core.contextonly"><code class="xref py py-func docutils literal notranslate"><span class="pre">contextonly()</span></code></a>
+and <a class="reference internal" href="core.html#tlang.core.contextfree" title="tlang.core.contextfree"><code class="xref py py-func docutils literal notranslate"><span class="pre">contextfree()</span></code></a> for, but the latter make their respective use cases
 more readable. The first two take an iterable of keys the that your transpiler
 will read from the context. They default to defining a transpiler that only
 reads the input string.</p>
@@ -631,7 +631,7 @@ reads the input string.</p>
 language it generates with little modification. This feature was included for
 debugging, educational purposes, and the potential to build training synthetic
 training data to train ML based approaches to code transformation. To enumerate
-all possible outputs of a transpiler, just call the <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code> method with no
+all possible outputs of a transpiler, just call the <a class="reference internal" href="core.html#tlang.core.Transpiler.run" title="tlang.core.Transpiler.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.run()</span></code></a> method with no
 arguments, or equivalently, pass <code class="docutils literal notranslate"><span class="pre">None</span></code> as the input string.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
 
