@@ -2,7 +2,7 @@
 Introduction
 ###########
 
-.. currentmodule:: tlang
+.. currentmodule:: tlang.core
 
 Tlang is a DSL designed to make writing readable mainainable transpilers less
 impossible. Tlang is similar in spirit to `Ohm <https://github.com/harc/ohm>`_,
