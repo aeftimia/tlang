@@ -77,7 +77,7 @@ for i in range(2):
 
 if __name__ == "__main__":
     print("made expression")
-    for j, exp in enumerate(simplify.run("10 * 1 + 10 * 1")):
+    for j, exp in enumerate(simplify.run("10 + 10")):
         if exp == "100":
             print("found")
             break
