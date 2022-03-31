@@ -93,9 +93,9 @@ however Tlang differs in its goals and implementation.</p>
 parsing by allowing parsers to compose. The underlying parser is probably best
 described as a scannerless context sensitive packrat parser that handles left
 recursion and ambiguity. Rather than returning one parse, parsers return
-generators. Alterations catch an <a class="reference internal" href="core.html#tlang.core.InfiniteLoop" title="tlang.core.InfiniteLoop"><code class="xref py py-class docutils literal notranslate"><span class="pre">InfiniteLoop</span></code></a> exception and reverse
-the order of their branches accordingly. The parser essentially reduces to a
-packrat parser for PEG grammars.</p>
+generators. Alterations catch an <cite>ValueError</cite> raised by generators upon reentry
+and reverse the order of their branches accordingly. The parser essentially
+reduces to a packrat parser for PEG grammars.</p>
 <p>Tlang defines a parser as a map from a context object (in our case a <a class="reference external" href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">Hash
 Array Mapped Trie</a>) to
 a generator of tuples containing an output string and a new context object.
@@ -558,7 +558,7 @@ are or behave like <code class="docutils literal notranslate"><span class="pre">
 <span class="nb">print</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">read_context</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name1&#39;, &#39;name3&#39;})
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name3&#39;, &#39;name1&#39;})
 </pre></div>
 </div>
 <p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
