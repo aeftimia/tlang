@@ -74,10 +74,6 @@ simplify = exp
 for i in range(2):
     simplify = abs(simplify * exp)
 
-def within(needle, haystack, sep):
-    common = (haystack + sep)[:] + haystack
-    f = common + (sep + needle).compT("")
-    return f + ~(sep + common) | (needle + sep).compT("") + common
 
 if __name__ == "__main__":
     print("made expression")

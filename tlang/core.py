@@ -12,7 +12,6 @@ class InfiniteLoop(Exception):
 
 
 class CachedParse:
-
     def __init__(self, generator, initial_context):
         self.generator = iter(generator)
         self.initial_context = initial_context
@@ -21,7 +20,7 @@ class CachedParse:
 
     def next(self):
         if self.gaurd:
-            self.gaurd = False  
+            self.gaurd = False
             raise ValueError
         self.gaurd = True
         try:
@@ -53,9 +52,11 @@ class CachedParse:
         for output, modifications in self.cache[i:]:
             yield output, merge(context, modifications)
 
+
 class HashDict(dict):
     def __hash__(self):
         return id(self)
+
 
 def diff(new, initial):
     """Record updates and deletions between initial and new maps
