@@ -171,7 +171,7 @@ of repetitions, and the step size specifies the same.
    advantages and disadvantages. List comprehension implements loopy non-greedy
    repetition. You can access the API for the four implementations directly at
    :class:`Repetition`, :class:`Greedy`, :func:`repetition`, :func:`greedy`.
-   For maximum performance on long repetitions, apply `decache` to remove any
+   For maximum performance on long repetitions, apply :func:`decache` to remove any
    caching from the parser to be repeated before creating the repetition.
 
 Sometimes it's useful to return the first of multiple matches. As is customary,

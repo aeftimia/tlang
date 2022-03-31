@@ -263,7 +263,7 @@ of repetitions, and the step size specifies the same.</p>
 advantages and disadvantages. List comprehension implements loopy non-greedy
 repetition. You can access the API for the four implementations directly at
 <a class="reference internal" href="core.html#tlang.core.Repetition" title="tlang.core.Repetition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repetition</span></code></a>, <a class="reference internal" href="core.html#tlang.core.Greedy" title="tlang.core.Greedy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Greedy</span></code></a>, <a class="reference internal" href="core.html#tlang.core.repetition" title="tlang.core.repetition"><code class="xref py py-func docutils literal notranslate"><span class="pre">repetition()</span></code></a>, <a class="reference internal" href="core.html#tlang.core.greedy" title="tlang.core.greedy"><code class="xref py py-func docutils literal notranslate"><span class="pre">greedy()</span></code></a>.
-For maximum performance on long repetitions, apply <cite>decache</cite> to remove any
+For maximum performance on long repetitions, apply <a class="reference internal" href="core.html#tlang.core.decache" title="tlang.core.decache"><code class="xref py py-func docutils literal notranslate"><span class="pre">decache()</span></code></a> to remove any
 caching from the parser to be repeated before creating the repetition.</p>
 </div>
 <p>Sometimes it’s useful to return the first of multiple matches. As is customary,
