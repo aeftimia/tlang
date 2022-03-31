@@ -12,9 +12,9 @@ Tlang approaches building transpilers as an extension of context sensitive
 parsing by allowing parsers to compose. The underlying parser is probably best
 described as a scannerless context sensitive packrat parser that handles left
 recursion and ambiguity. Rather than returning one parse, parsers return
-generators. Alterations catch an :class:`InfiniteLoop` exception and reverse
-the order of their branches accordingly. The parser essentially reduces to a
-packrat parser for PEG grammars.
+generators. Alterations catch an `ValueError` raised by generators upon reentry
+and reverse the order of their branches accordingly. The parser essentially
+reduces to a packrat parser for PEG grammars.
 
 Tlang defines a parser as a map from a context object (in our case a `Hash
 Array Mapped Trie <https://en.wikipedia.org/wiki/Hash_array_mapped_trie>`_) to

@@ -6,11 +6,6 @@ from immutables import Map as _Map
 from functools import lru_cache as _lru_cache, singledispatch as _singledispatch
 
 
-class InfiniteLoop(Exception):
-
-    __slots__ = ()
-
-
 class CachedParse:
     def __init__(self, generator, initial_context):
         self.generator = iter(generator)
