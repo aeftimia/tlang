@@ -17,12 +17,30 @@ class CachedParse:
         self.generator = iter(generator)
         self.initial_context = initial_context
         self.cache = []
+        self.gaurd = False
+
+    def next(self):
+        if self.gaurd:
+            self.gaurd = False  
+            raise ValueError
+        self.gaurd = True
+        try:
+            parse = next(self.generator)
+        except StopIteration:
+            self.gaurd = False
+            raise
+        self.gaurd = False
+        return parse
 
     def run(self, context):
         for output, modifications in self.cache:
             yield output, merge(context, modifications)
         i = len(self.cache)
-        for parse in self.generator:
+        while True:
+            try:
+                parse = self.next()
+            except StopIteration:
+                break
             # what if this parse was taken
             # from this very generator?
             for output, modifications in self.cache[i:]:
@@ -761,15 +779,10 @@ class Alteration(Combinator):
             yield from self.left(context)
         except ValueError:
             infiniteloop = True
-        L = list(self.right(context))
-        yield from L
-        print(L)
+        yield from self.right(context)
         if infiniteloop:
-            print('switch')
             try:
-                L = list(self.left(context))
-                print(L)
-                yield from L
+                yield from self.left(context)
             except ValueError:
                 return
 

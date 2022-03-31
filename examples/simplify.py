@@ -79,29 +79,12 @@ def within(needle, haystack, sep):
     f = common + (sep + needle).compT("")
     return f + ~(sep + common) | (needle + sep).compT("") + common
 
-factor = number
-needle = factor#.ref('match')
-sep = " * "
-common = (factor + sep)[:] + factor
-#print(list((factor + sep)[:](tlang.root_context.set("", "10 * 1"))))
-#print(list(((factor + sep)[:] + factor)(tlang.root_context.set("", "10 * 1"))))
-#raise
-f = common + (sep + needle).compT("")
-#(list(factor(tlang.root_context.set("", "10 * 1"))))
-#raise
-#(list(common(tlang.root_context.set("", "10 * 1"))))
-d = (factor.cache)
-#print(frozenset(d) - frozenset(c))
-#list(factor.run("10 * 1"))
-r = (tlang.null | factor) + factor + sep + needle
-print(list(r.run("10 * 1", return_context=True)))
-raise
 if __name__ == "__main__":
     print("made expression")
-    for j, exp in enumerate(factorize.run("10 * 1 + 10 * 1")):
-        assert eval(exp.replace("10", "2")) == 4, exp
+    for j, exp in enumerate(simplify.run("10 * 1 + 10 * 1")):
         if exp == "100":
             print("found")
             break
+        assert eval(exp.replace("100", "4").replace("10", "2")) == 4, exp
         print(exp)
     print("n", j)
