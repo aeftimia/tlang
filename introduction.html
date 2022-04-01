@@ -264,7 +264,13 @@ advantages and disadvantages. List comprehension implements loopy non-greedy
 repetition. You can access the API for the four implementations directly at
 <a class="reference internal" href="core.html#tlang.core.Repetition" title="tlang.core.Repetition"><code class="xref py py-class docutils literal notranslate"><span class="pre">Repetition</span></code></a>, <a class="reference internal" href="core.html#tlang.core.Greedy" title="tlang.core.Greedy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Greedy</span></code></a>, <a class="reference internal" href="core.html#tlang.core.repetition" title="tlang.core.repetition"><code class="xref py py-func docutils literal notranslate"><span class="pre">repetition()</span></code></a>, <a class="reference internal" href="core.html#tlang.core.greedy" title="tlang.core.greedy"><code class="xref py py-func docutils literal notranslate"><span class="pre">greedy()</span></code></a>.
 For maximum performance on long repetitions, apply <a class="reference internal" href="core.html#tlang.core.decache" title="tlang.core.decache"><code class="xref py py-func docutils literal notranslate"><span class="pre">decache()</span></code></a> to remove any
-caching from the parser to be repeated before creating the repetition.</p>
+caching from the parser to be repeated before creating the repetition.
+Generally, using recursive repetitions works nicely with macros but will
+blow out your stack with many consecutive matches. Greedy repetitions just
+give you the longest match, which is fast and efficient. Nongreedy
+repetitions are useful for ambiguous situations. Both can lead to
+counterintuitive situations if you’re not careful. For maximum performance,
+use <a class="reference internal" href="core.html#tlang.core.Greedy" title="tlang.core.Greedy"><code class="xref py py-class docutils literal notranslate"><span class="pre">Greedy</span></code></a> or <a class="reference internal" href="core.html#tlang.core.greedy" title="tlang.core.greedy"><code class="xref py py-func docutils literal notranslate"><span class="pre">greedy()</span></code></a> after applying <a class="reference internal" href="core.html#tlang.core.decache" title="tlang.core.decache"><code class="xref py py-func docutils literal notranslate"><span class="pre">decache()</span></code></a>.</p>
 </div>
 <p>Sometimes it’s useful to return the first of multiple matches. As is customary,
 this <a class="reference external" href="https://en.wikipedia.org/wiki/Parsing_expression_grammar">PEG</a>
@@ -285,7 +291,7 @@ alteration is introduced with the division operator.</p>
 []
 </pre></div>
 </div>
-<p>At this point, you’re probably wondering how Tlang is different from a parser
+<p>At this point, you’re might be wondering how Tlang is different from a parser
 generator framework that returns strings instead of parse trees. Because the
 output of Tlang parsers shares the same type as its input string, Tlang parsers
 can be composed seamlessly. Compositions (in conjuction with lookaheads) can be
@@ -322,16 +328,16 @@ sensitive parser: the <a class="reference internal" href="core.html#tlang.core.T
 <span class="n">from_stuff</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Terminal</span><span class="p">(</span><span class="s2">&quot;from table&quot;</span><span class="p">)</span>
 <span class="n">statement</span> <span class="o">=</span> <span class="n">select</span> <span class="o">|</span> <span class="n">from_stuff</span>
 <span class="n">statement</span> <span class="o">=</span> <span class="n">statement</span> <span class="o">*</span> <span class="n">tlang</span><span class="o">.</span><span class="n">Template</span><span class="p">(</span><span class="s2">&quot;drop&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select&quot;</span><span class="p">}))))</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;select * from table&quot;</span><span class="p">}))))</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="p">(</span><span class="n">Map</span><span class="p">({</span><span class="s2">&quot;&quot;</span><span class="p">:</span> <span class="s2">&quot;from table select *&quot;</span><span class="p">}))))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;select * from table&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table select *&quot;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">statement</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s2">&quot;from table select *&quot;</span><span class="p">)))</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39;&#39;}))]
-[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39; * from table&#39;}))]
-[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39; select *&#39;}))]
-[(&#39;drop&#39;, immutables.Map({&#39;&#39;: &#39; select *&#39;}))]
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;drop&#39;]
+[]
+[]
+[]
 </pre></div>
 </div>
 <p>Templates can be thought of as string formatting. In this case, the template
@@ -429,17 +435,17 @@ introduces the self reference later.</p>
 <span class="n">trim_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span>
 <span class="n">delete_whitespace</span> <span class="o">=</span> <span class="n">whitespace</span><span class="o">.</span><span class="n">compT</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
 <span class="n">key_value</span> <span class="o">=</span> <span class="n">string</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;:&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span> <span class="o">+</span> <span class="n">value</span>
-<span class="n">array</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">delimeted</span><span class="p">(</span><span class="n">key_value</span><span class="p">,</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span><span class="p">)</span>
-<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">array</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+<span class="n">array</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">delimeted</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span><span class="p">)</span>
+<span class="n">array</span> <span class="o">=</span> <span class="s2">&quot;[&quot;</span> <span class="o">+</span> <span class="o">~</span><span class="p">(</span><span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">array</span> <span class="o">+</span> <span class="n">delete_whitespace</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;]&quot;</span>
 <span class="n">mapping</span> <span class="o">=</span> <span class="n">tlang</span><span class="o">.</span><span class="n">delimeted</span><span class="p">(</span><span class="n">key_value</span><span class="p">,</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;,&quot;</span> <span class="o">+</span> <span class="n">trim_whitespace</span><span class="p">)</span>
-<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">mapping</span> <span class="o">+</span> <span class="n">delete_whitespace</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
+<span class="n">mapping</span> <span class="o">=</span> <span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="o">~</span><span class="p">(</span><span class="n">delete_whitespace</span> <span class="o">+</span> <span class="n">mapping</span> <span class="o">+</span> <span class="n">delete_whitespace</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span>
 <span class="n">fmt_json</span> <span class="o">=</span> <span class="n">array</span> <span class="o">|</span> <span class="n">mapping</span>
 <span class="c1"># fill placeholder with self reference</span>
 <span class="n">fmt_json</span> <span class="o">=</span> <span class="n">fmt_json</span><span class="o">.</span><span class="n">recurrence</span><span class="p">(</span><span class="s2">&quot;json&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{ &quot;key&quot;   : [&quot;value&quot; , 3,  {&quot;two : 2 } ]  }&#39;</span><span class="p">)))</span>
+<span class="nb">print</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">fmt_json</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="s1">&#39;{ &quot;key&quot;   : [&quot;value&quot; , 3,  {&quot;two&quot; : 2 } ]  }&#39;</span><span class="p">)))</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[]
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;{&quot;key&quot;: [&quot;value&quot;, 3, {&quot;two&quot;: 2}]}&#39;]
 </pre></div>
 </div>
 </section>
@@ -558,7 +564,7 @@ are or behave like <code class="docutils literal notranslate"><span class="pre">
 <span class="nb">print</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">read_context</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name3&#39;, &#39;name1&#39;})
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name1&#39;, &#39;name3&#39;})
 </pre></div>
 </div>
 <p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime

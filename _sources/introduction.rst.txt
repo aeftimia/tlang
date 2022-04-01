@@ -173,6 +173,12 @@ of repetitions, and the step size specifies the same.
    :class:`Repetition`, :class:`Greedy`, :func:`repetition`, :func:`greedy`.
    For maximum performance on long repetitions, apply :func:`decache` to remove any
    caching from the parser to be repeated before creating the repetition.
+   Generally, using recursive repetitions works nicely with macros but will
+   blow out your stack with many consecutive matches. Greedy repetitions just
+   give you the longest match, which is fast and efficient. Nongreedy
+   repetitions are useful for ambiguous situations. Both can lead to
+   counterintuitive situations if you're not careful. For maximum performance,
+   use :class:`Greedy` or :func:`greedy` after applying :func:`decache`.
 
 Sometimes it's useful to return the first of multiple matches. As is customary,
 this `PEG <https://en.wikipedia.org/wiki/Parsing_expression_grammar>`_
@@ -190,7 +196,7 @@ alteration is introduced with the division operator.
     print(list(select(Map({"": "select * from table"}))))
     print(list(select(Map({"": "from table select *"}))))
 
-At this point, you're probably wondering how Tlang is different from a parser
+At this point, you're might be wondering how Tlang is different from a parser
 generator framework that returns strings instead of parse trees. Because the
 output of Tlang parsers shares the same type as its input string, Tlang parsers
 can be composed seamlessly. Compositions (in conjuction with lookaheads) can be
@@ -230,10 +236,10 @@ sensitive parser: the :class:`Template`.
    from_stuff = tlang.Terminal("from table")
    statement = select | from_stuff
    statement = statement * tlang.Template("drop")
-   print(list(statement(Map({"": "select"}))))
-   print(list(statement(Map({"": "select * from table"}))))
-   print(list(statement(Map({"": "from table select *"}))))
-   print(list(statement(Map({"": "from table select *"}))))
+   print(list(statement.run("select")))
+   print(list(statement.run("select * from table")))
+   print(list(statement.run("from table select *")))
+   print(list(statement.run("from table select *")))
 
 Templates can be thought of as string formatting. In this case, the template
 will ingest anything and return ``drop``. This behavior can be useful for
@@ -327,14 +333,14 @@ introduces the self reference later.
     trim_whitespace = whitespace.compT(" ")
     delete_whitespace = whitespace.compT("")
     key_value = string + delete_whitespace + ":" + trim_whitespace + value
-    array = tlang.delimeted(key_value, delete_whitespace + "," + trim_whitespace)
-    mapping = "{" + delete_whitespace + array + delete_whitespace + "}"
+    array = tlang.delimeted(value, delete_whitespace + "," + trim_whitespace)
+    array = "[" + ~(delete_whitespace + array + delete_whitespace) + "]"
     mapping = tlang.delimeted(key_value, delete_whitespace + "," + trim_whitespace)
-    mapping = "{" + delete_whitespace + mapping + delete_whitespace + "}"
+    mapping = "{" + ~(delete_whitespace + mapping + delete_whitespace) + "}"
     fmt_json = array | mapping
     # fill placeholder with self reference
     fmt_json = fmt_json.recurrence("json")
-    print(list(fmt_json.run('{ "key"   : ["value" , 3,  {"two : 2 } ]  }')))
+    print(list(fmt_json.run('{ "key"   : ["value" , 3,  {"two" : 2 } ]  }')))
 
 
 **********
