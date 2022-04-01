@@ -11,30 +11,12 @@ class CachedParse:
         self.generator = iter(generator)
         self.initial_context = initial_context
         self.cache = []
-        self.gaurd = False
-
-    def next(self):
-        if self.gaurd:
-            self.gaurd = False
-            raise ValueError
-        self.gaurd = True
-        try:
-            parse = next(self.generator)
-        except StopIteration:
-            self.gaurd = False
-            raise
-        self.gaurd = False
-        return parse
 
     def run(self, context):
         for output, modifications in self.cache:
             yield output, merge(context, modifications)
         i = len(self.cache)
-        while True:
-            try:
-                parse = self.next()
-            except StopIteration:
-                break
+        for parse in self.generator:
             # what if this parse was taken
             # from this very generator?
             for output, modifications in self.cache[i:]:
