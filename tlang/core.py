@@ -1,4 +1,4 @@
-import string
+import string as _string
 
 from itertools import starmap as _starmap
 from collections import deque as _deque
@@ -952,7 +952,7 @@ def contextfree(parser):
 
 def contextonly(read_context=frozenset([""])):
     """Create a transpiler that manipulates context while returning an empty
-    output string.
+    output _string.
 
     Args:
         parser: Callable generator taking and yielding a context object.
@@ -982,10 +982,10 @@ def oneof(strings):
     return PEGAlteration.new(tuple(map(Terminal, frozenset(strings))))
 
 
-lower_case = oneof(string.ascii_lowercase)
-upper_case = oneof(string.ascii_uppercase)
+lower_case = oneof(_string.ascii_lowercase)
+upper_case = oneof(_string.ascii_uppercase)
 letter = lower_case / upper_case
-digit = oneof(string.digits)
+digit = oneof(_string.digits)
 alphanum = letter / digit
 
 
