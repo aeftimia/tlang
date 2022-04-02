@@ -1,6 +1,6 @@
-###########
+**********
 Introduction
-###########
+**********
 
 .. currentmodule:: tlang.core
 
@@ -12,7 +12,7 @@ possible usecase, Tlang aims to make it as simple as possible to define new
 parsers and operations that integrate nicely with its core constructs.
 
 Implementation
-============
+=============
 
 Tlang approaches building transpilers as an extension of context sensitive
 parsing by allowing parsers to compose. The underlying parser is probably best
@@ -45,6 +45,7 @@ makes Tlang especially well suited for building transpilers.
 **********
 Quickstart
 **********
+
 I get it. You don't want to read a manual about something you're not sure you
 care about. I'm assuming you're interested in quickly building something that
 can manipulate code in complex ways. Here's an example of a script that will
@@ -73,9 +74,13 @@ simple when the going gets tough. The core framework really just consists of
 terminals, alterations, concatenations, composition, and a linking mechanism
 that allows for self reference. Everything else is a convenience.
 
+
 **********
+Core Constructs
+**********
+
 Terminals
-**********
+=========
 
 Transpilers created with Tlang are designed to ingest context objects and
 return a generator of tuples containing output strings and new context objects.
@@ -115,16 +120,16 @@ can see this by calling it.
     print(list(select(Map({"": "select * from table"}))))
     print(list(select(Map({"": "from table select *"}))))
 
-While defining input inthis way is admittedly clunky, it greatly streamlines
+While defining input in this way is admittedly clunky, it greatly streamlines
 static analysis.  We can see the terminal "ingested" the leading ``"select"``
 from any input strings that started with it. That is, it removed the matched
 string from the beginning of the input, and returned it as output.  More
 generally, all Tlang transpilers ingest a context object, and return a
 generator of tuples containing an output string and a new context object.
 
-**********
+
 Combinators
-**********
+============
 
 Like rules in a BNF spec, Tlang transpilers can be applied sequentially with
 concatenations or combined as a series of alternatives with alterations.
@@ -236,9 +241,9 @@ This composition is effectively parsing "select" or "from stuff" and then just
 "select" out of that result. This is of course equivalent to just parsing
 "select".
 
-**********
+
 Templates and References
-**********
+==========
 
 To make use of this concept for transpilation, we introduce our first context
 sensitive parser: the :class:`Template`.
@@ -322,9 +327,9 @@ You can parse exact matches of the results of previous parses with :class:`Ref`.
    print(list(factor.run("y^2 + x^2 + 2xx")))
 
 
-**********
+
 Recursion
-**********
+============
 
 BNF handles self reference nicely because it's a spec that doesn't inherently
 need to compile. However, like most langauges, Python requires variables be
@@ -359,9 +364,9 @@ introduces the self reference later.
     print(list(fmt_json.run('{ "key"   : ["value" , 3,  {"two" : 2 } ]  }')))
 
 
-**********
+
 Macros
-**********
+=======
 
 Sometimes you have a perfectly good transpiler for one task that's *almost*
 perfect for another task. For example, say you built something that traspiles
@@ -466,7 +471,7 @@ are or behave like ``frozenset`` s.
 
 Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
 (e.g. :class:`Combinator` instances) will attempt to cache their operations.
-These transpilers use their read_context in conjunction with the context it
+These transpilers use their ``read_context`` in conjunction with the context it
 receives to derive a key for its own cache. They likewise derive the piece of
 output context stored within the cache from the write_context. This is
 respectively merged with the true input context upon cache lookups to simulate

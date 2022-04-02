@@ -458,13 +458,13 @@ def roundrobin(iterables):
 
 
 def transpiler(read_context=frozenset([""])):
-    """Acts as decorator for quickly writing custom transpilers.
+    """Decorator for quickly writing custom transpilers.
 
     Args:
         read_context (iterable): read_context of transpiler
 
     Returns:
-        callable: Wrapper that returns a ``UserDefined``"""
+        callable: Wrapper that returns a ``FromProcessor``"""
     read_context = frozenset(read_context)
 
     def wrapper(processor):
@@ -952,7 +952,7 @@ def contextfree(parser):
 
 def contextonly(read_context=frozenset([""])):
     """Create a transpiler that manipulates context while returning an empty
-    output _string.
+    output string.
 
     Args:
         parser: Callable generator taking and yielding a context object.
