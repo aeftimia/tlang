@@ -40,23 +40,24 @@
               <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#quickstart">Quickstart</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#terminals">Terminals</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#combinators">Combinators</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#templates-and-references">Templates and References</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#recursion">Recursion</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#macros">Macros</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#static-analysis">Static Analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#cache-sharing">Cache Sharing</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#creating-custom-one-offs">Creating Custom One-Offs</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#generative-mode">Generative Mode</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#quickstart">Quickstart</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#core-constructs">Core Constructs</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#terminals">Terminals</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#combinators">Combinators</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#templates-and-references">Templates and References</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#recursion">Recursion</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#macros">Macros</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#static-analysis">Static Analysis</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#cache-sharing">Cache Sharing</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="#creating-custom-one-offs">Creating Custom One-Offs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#generative-mode">Generative Mode</a></li>
 </ul>
 <p class="caption" role="heading"><span class="caption-text">Python API</span></p>
 <ul>
@@ -120,8 +121,10 @@ parsers can be composed as seamlessly as they can be joined via concatenation
 or alteraion. This allows you to write code that effectively executes multiple
 passes as cleanly as you can write code that executes a single pass. It also
 makes Tlang especially well suited for building transpilers.</p>
+</section>
+</section>
 <section id="quickstart">
-<h3>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h3>
+<h1>Quickstart<a class="headerlink" href="#quickstart" title="Permalink to this headline"></a></h1>
 <p>I get it. You don’t want to read a manual about something you’re not sure you
 care about. I’m assuming you’re interested in quickly building something that
 can manipulate code in complex ways. Here’s an example of a script that will
@@ -151,8 +154,10 @@ simple when the going gets tough. The core framework really just consists of
 terminals, alterations, concatenations, composition, and a linking mechanism
 that allows for self reference. Everything else is a convenience.</p>
 </section>
+<section id="core-constructs">
+<h1>Core Constructs<a class="headerlink" href="#core-constructs" title="Permalink to this headline"></a></h1>
 <section id="terminals">
-<h3>Terminals<a class="headerlink" href="#terminals" title="Permalink to this headline"></a></h3>
+<h2>Terminals<a class="headerlink" href="#terminals" title="Permalink to this headline"></a></h2>
 <p>Transpilers created with Tlang are designed to ingest context objects and
 return a generator of tuples containing output strings and new context objects.
 Context objects are immutable maps currently powered by <a class="reference external" href="https://github.com/MagicStack/immutables">MagicStack’s
@@ -196,7 +201,7 @@ can see this by calling it.</p>
 []
 </pre></div>
 </div>
-<p>While defining input inthis way is admittedly clunky, it greatly streamlines
+<p>While defining input in this way is admittedly clunky, it greatly streamlines
 static analysis.  We can see the terminal “ingested” the leading <code class="docutils literal notranslate"><span class="pre">&quot;select&quot;</span></code>
 from any input strings that started with it. That is, it removed the matched
 string from the beginning of the input, and returned it as output.  More
@@ -204,7 +209,7 @@ generally, all Tlang transpilers ingest a context object, and return a
 generator of tuples containing an output string and a new context object.</p>
 </section>
 <section id="combinators">
-<h3>Combinators<a class="headerlink" href="#combinators" title="Permalink to this headline"></a></h3>
+<h2>Combinators<a class="headerlink" href="#combinators" title="Permalink to this headline"></a></h2>
 <p>Like rules in a BNF spec, Tlang transpilers can be applied sequentially with
 concatenations or combined as a series of alternatives with alterations.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
@@ -335,7 +340,7 @@ used to specify a superset of <a class="reference external" href="https://en.wik
 “select”.</p>
 </section>
 <section id="templates-and-references">
-<h3>Templates and References<a class="headerlink" href="#templates-and-references" title="Permalink to this headline"></a></h3>
+<h2>Templates and References<a class="headerlink" href="#templates-and-references" title="Permalink to this headline"></a></h2>
 <p>To make use of this concept for transpilation, we introduce our first context
 sensitive parser: the <a class="reference internal" href="core.html#tlang.core.Template" title="tlang.core.Template"><code class="xref py py-class docutils literal notranslate"><span class="pre">Template</span></code></a>.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
@@ -432,7 +437,7 @@ template since the context key for the input string is an empty string.</p>
 </div>
 </section>
 <section id="recursion">
-<h3>Recursion<a class="headerlink" href="#recursion" title="Permalink to this headline"></a></h3>
+<h2>Recursion<a class="headerlink" href="#recursion" title="Permalink to this headline"></a></h2>
 <p>BNF handles self reference nicely because it’s a spec that doesn’t inherently
 need to compile. However, like most langauges, Python requires variables be
 declared before they are referenced. This makes creating self-referencing
@@ -467,7 +472,7 @@ introduces the self reference later.</p>
 </div>
 </section>
 <section id="macros">
-<h3>Macros<a class="headerlink" href="#macros" title="Permalink to this headline"></a></h3>
+<h2>Macros<a class="headerlink" href="#macros" title="Permalink to this headline"></a></h2>
 <p>Sometimes you have a perfectly good transpiler for one task that’s <em>almost</em>
 perfect for another task. For example, say you built something that traspiles
 some dialect of SQL. Now you’re working on something that transpiles a slightly
@@ -564,8 +569,9 @@ alterations.</p>
 </pre></div>
 </div>
 </section>
+</section>
 <section id="static-analysis">
-<h3>Static Analysis<a class="headerlink" href="#static-analysis" title="Permalink to this headline"></a></h3>
+<h1>Static Analysis<a class="headerlink" href="#static-analysis" title="Permalink to this headline"></a></h1>
 <p>Under the hood, transpilers work similar to packrat parser generators. There
 are of course more Tlang transpiler primitives than in most implementations of
 packrat parser generators, and Tlang’s parsers can be context sensitive as well.
@@ -586,7 +592,7 @@ are or behave like <code class="docutils literal notranslate"><span class="pre">
 </div>
 <p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
 (e.g. <a class="reference internal" href="core.html#tlang.core.Combinator" title="tlang.core.Combinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">Combinator</span></code></a> instances) will attempt to cache their operations.
-These transpilers use their read_context in conjunction with the context it
+These transpilers use their <code class="docutils literal notranslate"><span class="pre">read_context</span></code> in conjunction with the context it
 receives to derive a key for its own cache. They likewise derive the piece of
 output context stored within the cache from the write_context. This is
 respectively merged with the true input context upon cache lookups to simulate
@@ -597,8 +603,6 @@ possibilities of their child parsers.</p>
 <p><a class="reference internal" href="core.html#tlang.core.Anything" title="tlang.core.Anything"><code class="xref py py-class docutils literal notranslate"><span class="pre">Anything</span></code></a> is a class that implements just enough <code class="docutils literal notranslate"><span class="pre">frozenset</span></code> methods
 to act like it stores everything. Kind of like <code class="docutils literal notranslate"><span class="pre">nan</span></code> in floating point
 arithmetic.</p>
-</section>
-</section>
 <section id="cache-sharing">
 <h2>Cache Sharing<a class="headerlink" href="#cache-sharing" title="Permalink to this headline"></a></h2>
 <p>If you create two instances of the same transpiler, they’ll have their own
@@ -620,8 +624,10 @@ project roadmap.</p>
 <p>In the mean time, reusing variables goes a long way to overcome this issue and
 speed up the resulting transpiler. Also it tends to makes your code more
 readable anyway!</p>
+</section>
+</section>
 <section id="creating-custom-one-offs">
-<h3>Creating Custom One-Offs<a class="headerlink" href="#creating-custom-one-offs" title="Permalink to this headline"></a></h3>
+<h1>Creating Custom One-Offs<a class="headerlink" href="#creating-custom-one-offs" title="Permalink to this headline"></a></h1>
 <p>There were two directions Tlang take from here. Either we try to anticipate
 every circumstance and keep creating new <code class="docutils literal notranslate"><span class="pre">Transpiler</span></code> classes for them, or we
 make it as simple as possible to build your own transpilers for one-off
@@ -649,7 +655,7 @@ will read from the context. They default to defining a transpiler that only
 reads the input string.</p>
 </section>
 <section id="generative-mode">
-<h3>Generative Mode<a class="headerlink" href="#generative-mode" title="Permalink to this headline"></a></h3>
+<h1>Generative Mode<a class="headerlink" href="#generative-mode" title="Permalink to this headline"></a></h1>
 <p>A side effect of Tlang’s structure is being able to enumerate instances of the
 language it generates with little modification. This feature was included for
 debugging, educational purposes, and the potential to build training synthetic
@@ -667,8 +673,6 @@ arguments, or equivalently, pass <code class="docutils literal notranslate"><spa
 <div class="highlight-none notranslate"><div class="highlight"><pre><span></span>[&#39;ac&#39;, &#39;bc&#39;, &#39;ad&#39;, &#39;bd&#39;]
 </pre></div>
 </div>
-</section>
-</section>
 </section>
 
 
