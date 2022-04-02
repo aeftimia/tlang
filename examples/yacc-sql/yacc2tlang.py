@@ -39,8 +39,8 @@ def pgreedy(t):
 
 
 var_name = not_newline + pgreedy(not_newline)
-build_python_name = tlang.digit.compT("var_{}") / tlang.null + pgreedy(
-    tlang.alphanum / tlang.wild.compT("_")
+build_python_name = tlang.digit.T("var_{}") / tlang.null + pgreedy(
+    tlang.alphanum / tlang.wild.T("_")
 )
 python_from_token = var_name.ref("terminal string") * build_python_name
 python_from_token = python_from_token.ref("name")
@@ -51,10 +51,10 @@ token_assignment *= tlang.Template(
 token_assignment += declare
 whitespace = tlang.Terminal("\n") / " " / "\t" / "\r" / "\f"
 whitespaces = pgreedy(whitespace)
-remove_whitespaces = whitespaces.compT("")
+remove_whitespaces = whitespaces.T("")
 quote = tlang.Terminal("'")
 quoted = quote + pgreedy((tlang.Terminal("\\") + quote) / quote.inv()) + quote
-quoted = quoted.compT("tlang.Terminal({}) + whitespaces")
+quoted = quoted.T("tlang.Terminal({}) + whitespaces")
 start_comment = tlang.Terminal("/*")
 end_comment = tlang.Terminal("*/")
 single_line_comment = start_comment
@@ -74,29 +74,27 @@ single_line_comment *= tlang.Template("# {slc}\n")
 multi_line_comment = start_comment
 multi_line_comment += pgreedy(end_comment.inv())
 multi_line_comment += end_comment
-comment = single_line_comment / multi_line_comment.compT("")
+comment = single_line_comment / multi_line_comment.T("")
 comment = remove_whitespaces + comment + remove_whitespaces
 varchar = tlang.alphanum / "_" / "-" / "."
 rule_name = varchar + pgreedy(varchar)
 rule_name *= build_python_name
 referenced = rule_name * reference
-rule_or_token = referenced / quoted / single_line_comment.compT("tlang.null")
-concatenation = tlang.delimeted(rule_or_token, whitespaces.compT(" + "))
-pipe = tlang.Terminal("|").compT(" | ") + remove_whitespaces
+rule_or_token = referenced / quoted / single_line_comment.T("tlang.null")
+concatenation = tlang.delimeted(rule_or_token, whitespaces.T(" + "))
+pipe = tlang.Terminal("|").T(" | ") + remove_whitespaces
 alteration = tlang.delimeted(concatenation, remove_whitespaces + pipe)
 rule_assignment = (
-    rule_name.ref("name") + remove_whitespaces +
-    tlang.Terminal(":").compT(" = ")
+    rule_name.ref("name") + remove_whitespaces + tlang.Terminal(":").T(" = ")
 )
 rule_assignment += (
-    (whitespaces.compT("tlang.null") + pipe) / remove_whitespaces
+    (whitespaces.T("tlang.null") + pipe) / remove_whitespaces
     + alteration
-    + (whitespaces + ";").compT("")
+    + (whitespaces + ";").T("")
 )
 rule_assignment += declare
 rule_assignment_lines = tlang.delimeted(
-    rule_assignment / comment, whitespaces.compT("\n")
-)
+    rule_assignment / comment, whitespaces.T("\n"))
 token_line = comment / (token_assignment + pgreedy(newline))
 token_lines = pgreedy(token_line)
 start_lines = "%start"
@@ -105,14 +103,14 @@ start_lines += rule_name.ref("start")
 start_lines += pgreedy(tlang.Terminal("%%").inv())
 end_header = tlang.Terminal("%}")
 header = tlang.Terminal("%{") + pgreedy(end_header.inv()) + end_header
-header_lines = pgreedy(comment) + header.compT("")
+header_lines = pgreedy(comment) + header.T("")
 body = header_lines
 body += whitespaces + token_lines
-body += (whitespaces + start_lines).compT("")
-rule_delimeter = whitespaces.compT("\n") + ("%%" + whitespaces).compT("")
-body += rule_delimeter + rule_assignment_lines + rule_delimeter.compT("")
+body += (whitespaces + start_lines).T("")
+rule_delimeter = whitespaces.T("\n") + ("%%" + whitespaces).T("")
+body += rule_delimeter + rule_assignment_lines + rule_delimeter.T("")
 body += create_lookup
-transpiler = body.compT(
+transpiler = body.T(
     r"""import tlang
 
 # performant greedy

@@ -4,29 +4,27 @@ import tlang
 
 space_charcter = " " | tlang.Terminal("\n")
 whitespace = space_charcter[:]
-delete_whitespace = whitespace.compT("")
+delete_whitespace = whitespace.T("")
 
 # match single or double but convert to double quotes
-quote = (tlang.Terminal('"') | "'").ref("quote").compT('"')
+quote = (tlang.Terminal('"') | "'").ref("quote").T('"')
 string = (
-    quote + (-tlang.Ref("quote") +
-             tlang.wild)[:] + tlang.Ref("quote").compT('"')
+    quote + (-tlang.Ref("quote") + tlang.wild)[:] + tlang.Ref("quote").T('"')
 ).reset()
-remove_zeros = tlang.Terminal("0")[:].compT("")
+remove_zeros = tlang.Terminal("0")[:].T("")
 nonzero = -tlang.Terminal("0") + tlang.digit
 digits = tlang.digit[:]
-full_decimal = (digits + nonzero) + remove_zeros | remove_zeros.compT("0")
+full_decimal = (digits + nonzero) + remove_zeros | remove_zeros.T("0")
 full_decimal = "." + full_decimal
 # 000000.stuff
 number = "0" + remove_zeros + ~full_decimal
 # 0000stuff.stuff
 number |= remove_zeros + nonzero + digits + ~full_decimal
 # .stuff
-number |= full_decimal.compT("0{}")
+number |= full_decimal.T("0{}")
 number = ~tlang.Terminal("-") + number
-number = number.comp(tlang.Terminal(
-    "-0").compT("0").complete() / tlang.identity)
-value = tlang.Terminal("None").compT("null")
+number *= tlang.Terminal("-0").T("0").complete() / tlang.identity
+value = tlang.Terminal("None").T("null")
 value |= string | number
 empty = "[" + delete_whitespace + "]"
 empty |= "{" + delete_whitespace + "}"
@@ -41,7 +39,7 @@ def adjust_indentation(context):
 
 def make_block(entry):
     block = delete_whitespace + entry + delete_whitespace
-    block = block.compT("\n{indent}{}")
+    block = block.T("\n{indent}{}")
     # comma separated
     block = tlang.delimeted(block, ",")
     block = adjust_indentation + block
@@ -51,11 +49,10 @@ def make_block(entry):
 
 
 json_formatter = "[" + make_block(value) + \
-    tlang.Terminal("]").compT("\n{indent}{}")
-key_value = string + delete_whitespace + ":" + whitespace.compT(" ") + value
-json_formatter |= (
-    "{" + make_block(key_value) + tlang.Terminal("}").compT("\n{indent}{}")
-)
+    tlang.Terminal("]").T("\n{indent}{}")
+key_value = string + delete_whitespace + ":" + whitespace.T(" ") + value
+json_formatter |= "{" + make_block(key_value) + \
+    tlang.Terminal("}").T("\n{indent}{}")
 json_formatter = json_formatter.recurrence("json")
 json_formatter |= empty
 json_formatter = delete_whitespace + json_formatter + delete_whitespace

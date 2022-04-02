@@ -254,7 +254,7 @@ class Transpiler:
         Remember incomplete parses are fed through too!"""
         return Composed((self, other))
 
-    def compT(self, other, ldelim="{", rdelim="}", output="__output__"):
+    def T(self, other, ldelim="{", rdelim="}", output="__output__"):
         """Construct a ``Template`` and compose this parser with it."""
         return Composed(
             (self, Template(other, ldelim=ldelim, rdelim=rdelim, output=""))
@@ -991,8 +991,8 @@ alphanum = letter / digit
 
 def within(needle, haystack, sep):
     common = (haystack + sep)[:] + haystack
-    f = common + (sep + needle).compT("")
-    return f + ~(sep + common) | (needle + sep).compT("") + common
+    f = common + (sep + needle).T("")
+    return f + ~(sep + common) | (needle + sep).T("") + common
 
 
 def both_within(
@@ -1005,7 +1005,7 @@ def both_within(
     if commutative:
         found |= b + sep + a
         just_needles |= needle2 + sep + needle1
-    return just_needles.compT(template2) | found.compT(template1)
+    return just_needles.T(template2) | found.T(template1)
 
 
 def delimeted(transpiler, delimeter, greedy=True, cache=False):

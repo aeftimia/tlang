@@ -5,8 +5,14 @@ Introduction
 .. currentmodule:: tlang.core
 
 Tlang is a DSL designed to make writing readable mainainable transpilers less
-impossible. Tlang is similar in spirit to `Ohm <https://github.com/harc/ohm>`_,
-however Tlang differs in its goals and implementation.
+impossible. Tlang is a minimal framework within Python that seamlessly handles
+left recursion, context sensitivity, ambiguity, and multiple passes. It is
+designed to be lightweight, and flexible. Recognizing it can't anticipate every
+possible usecase, Tlang aims to make it as simple as possible to define new
+parsers and operations that integrate nicely with its core constructs.
+
+Implementation
+============
 
 Tlang approaches building transpilers as an extension of context sensitive
 parsing by allowing parsers to compose. The underlying parser is probably best
@@ -29,10 +35,12 @@ to the context are stored under this key. This maximizes cache hits when
 irrelevant aspects of the context have changed while maintaining asymptotic
 performance.
 
-Recognizing the immense variety of possible operators needed in production
-environments, Tlang aims to be a minimal framework that makes it
-straightforward to define new parsers and operations that integrate nicely with
-its core constructs.
+Since the output string of the parser is the same type as the input string,
+parsers can be composed as seamlessly as they can be joined via concatenation
+or alteraion. This allows you to write code that effectively executes multiple
+passes as cleanly as you can write code that executes a single pass. It also
+makes Tlang especially well suited for building transpilers.
+
 
 **********
 Quickstart
@@ -48,8 +56,8 @@ escaping newlines) while formatting whitespace.
     import tlang
 
     whitespace = tlang.Greedy(tlang.Terminal(" "))
-    trim_whitespace = whitespace.compT(" ")
-    delete_whitespace = whitespace.compT("")
+    trim_whitespace = whitespace.T(" ")
+    delete_whitespace = whitespace.T("")
     variable = tlang.letter + (tlang.alphanum | "_")[:]
     definition = variable.ref("name") + whitespace + "=" + whitespace
     args = tlang.delimeted(variable, delete_whitespace + "," + trim_whitespace)
@@ -59,17 +67,25 @@ escaping newlines) while formatting whitespace.
     definition *= tlang.Template("def {name}({args}):\n  return {content}")
     print(list(definition.run("add  =   lambda   x ,  y :     x + y")))
 
+Some of the conventions may seem arbitrary and adhoc, but under the hood is a
+very simple and self consistent framework that is designed to keep things
+simple when the going gets tough. The core framework really just consists of
+terminals, alterations, concatenations, composition, and a linking mechanism
+that allows for self reference. Everything else is a convenience.
+
 **********
 Terminals
 **********
 
 Transpilers created with Tlang are designed to ingest context objects and
 return a generator of tuples containing output strings and new context objects.
-The context object stores the input string under the ``""`` key. The input
-string is generally your source code, and output strings are one or more new
-versions of your code. Like writing a `BNF
-<https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>`_ spec, Tlang allows
-you to specify terminals, and combine rules with alterations and
+Context objects are immutable maps currently powered by `MagicStack's
+immutables.Map <https://github.com/MagicStack/immutables>`_. We hope to
+customize this implementation in future releases.  The context object stores
+the input string under the ``""`` key. The input string is generally your
+source code, and output strings are one or more new versions of your code. Like
+writing a `BNF <https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>`_ spec,
+Tlang allows you to specify terminals, and combine rules with alterations and
 concatenations.
 
 Let's start with a simple example.
@@ -173,6 +189,12 @@ of repetitions, and the step size specifies the same.
    :class:`Repetition`, :class:`Greedy`, :func:`repetition`, :func:`greedy`.
    For maximum performance on long repetitions, apply :func:`decache` to remove any
    caching from the parser to be repeated before creating the repetition.
+   Generally, using recursive repetitions works nicely with macros but will
+   blow out your stack with many consecutive matches. Greedy repetitions just
+   give you the longest match, which is fast and efficient. Nongreedy
+   repetitions are useful for ambiguous situations. Both can lead to
+   counterintuitive situations if you're not careful. For maximum performance,
+   use :class:`Greedy` or :func:`greedy` after applying :func:`decache`.
 
 Sometimes it's useful to return the first of multiple matches. As is customary,
 this `PEG <https://en.wikipedia.org/wiki/Parsing_expression_grammar>`_
@@ -190,7 +212,7 @@ alteration is introduced with the division operator.
     print(list(select(Map({"": "select * from table"}))))
     print(list(select(Map({"": "from table select *"}))))
 
-At this point, you're probably wondering how Tlang is different from a parser
+At this point, you're might be wondering how Tlang is different from a parser
 generator framework that returns strings instead of parse trees. Because the
 output of Tlang parsers shares the same type as its input string, Tlang parsers
 can be composed seamlessly. Compositions (in conjuction with lookaheads) can be
@@ -230,10 +252,10 @@ sensitive parser: the :class:`Template`.
    from_stuff = tlang.Terminal("from table")
    statement = select | from_stuff
    statement = statement * tlang.Template("drop")
-   print(list(statement(Map({"": "select"}))))
-   print(list(statement(Map({"": "select * from table"}))))
-   print(list(statement(Map({"": "from table select *"}))))
-   print(list(statement(Map({"": "from table select *"}))))
+   print(list(statement.run("select")))
+   print(list(statement.run("select * from table")))
+   print(list(statement.run("from table select *")))
+   print(list(statement.run("from table select *")))
 
 Templates can be thought of as string formatting. In this case, the template
 will ingest anything and return ``drop``. This behavior can be useful for
@@ -276,11 +298,11 @@ nonexistant key is referenced from the context.
    select = tlang.Terminal("select").ref('nested')
    from_stuff = tlang.Terminal("from table")
    statement = (select | from_stuff).ref('match')
-   print(list(statement.compT("don't {match}").run("from table")))
-   print(list(statement.compT("{} don't {match.nested}").run("from table")))
-   print(list(statement.compT("don't {nonexistent}").run("from table")))
+   print(list(statement.T("don't {match}").run("from table")))
+   print(list(statement.T("{} don't {match.nested}").run("from table")))
+   print(list(statement.T("don't {nonexistent}").run("from table")))
 
-Composition with Templates is common enough we included :meth:`Transpiler.compT`
+Composition with Templates is common enough we included :meth:`Transpiler.T`
 as a shortcut. Note that empty delimiters denote the text passed to the
 template since the context key for the input string is an empty string.
 
@@ -294,7 +316,7 @@ You can parse exact matches of the results of previous parses with :class:`Ref`.
    x = variable.ref('v1')
    y = variable.ref('v2')
    perfect_square = x + '^2 + ' + y + '^2 + 2' + tlang.Ref('v1') + tlang.Ref('v2')
-   factor = perfect_square.compT('({v1} + {v2})^2')
+   factor = perfect_square.T('({v1} + {v2})^2')
    print(list(factor.run("x^2 + y^2 + 2xy")))
    print(list(factor.run("y^2 + x^2 + 2yx")))
    print(list(factor.run("y^2 + x^2 + 2xx")))
@@ -324,17 +346,17 @@ introduces the self reference later.
     integer = (-tlang.Terminal("0") + integer) / "0"
     value = integer | string | tlang.Placeholder("json")
     whitespace = tlang.Terminal(" ")[:]
-    trim_whitespace = whitespace.compT(" ")
-    delete_whitespace = whitespace.compT("")
+    trim_whitespace = whitespace.T(" ")
+    delete_whitespace = whitespace.T("")
     key_value = string + delete_whitespace + ":" + trim_whitespace + value
-    array = tlang.delimeted(key_value, delete_whitespace + "," + trim_whitespace)
-    mapping = "{" + delete_whitespace + array + delete_whitespace + "}"
+    array = tlang.delimeted(value, delete_whitespace + "," + trim_whitespace)
+    array = "[" + ~(delete_whitespace + array + delete_whitespace) + "]"
     mapping = tlang.delimeted(key_value, delete_whitespace + "," + trim_whitespace)
-    mapping = "{" + delete_whitespace + mapping + delete_whitespace + "}"
+    mapping = "{" + ~(delete_whitespace + mapping + delete_whitespace) + "}"
     fmt_json = array | mapping
     # fill placeholder with self reference
     fmt_json = fmt_json.recurrence("json")
-    print(list(fmt_json.run('{ "key"   : ["value" , 3,  {"two : 2 } ]  }')))
+    print(list(fmt_json.run('{ "key"   : ["value" , 3,  {"two" : 2 } ]  }')))
 
 
 **********
@@ -364,8 +386,8 @@ the ground up.
     integer = (-tlang.Terminal('0') + integer) / '0'
     value = integer | string | tlang.Placeholder('json')
     whitespace = tlang.Terminal(' ')[:]
-    trim_whitespace = whitespace.compT(' ')
-    delete_whitespace = whitespace.compT('')
+    trim_whitespace = whitespace.T(' ')
+    delete_whitespace = whitespace.T('')
     def comma_sep(entry):
         entry += delete_whitespace
         return delete_whitespace + entry + (',' + trim_whitespace + entry)[:]

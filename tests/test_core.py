@@ -18,7 +18,7 @@ def test_optional():
 def test_named_alt():
     content = tlang.Terminal("a").ref("content")
     rule = "(" + content + ")"
-    rule |= rule.compT("{content}")
+    rule |= rule.T("{content}")
     assert ["(a)", "a"] == list(rule.run("(a)"))
 
 
@@ -204,7 +204,7 @@ def test_match():
 
 def test_ambiguous_match():
     search = tlang.Terminal("a").ref("p")
-    match = tlang.Ref("p").compT("p")
+    match = tlang.Ref("p").T("p")
     filler = tlang.Terminal("a") | "b"
     rule = search + filler[:] + match + filler[:]
     assert ["aap", "apa"] == list(rule.run("aaa"))
@@ -222,14 +222,14 @@ def test_context_tracking():
     assert frozenset(["", "L"]) == alt.read_context
 
 
-def test_compT():
-    rule = tlang.Terminal("a").compT("1")
+def test_T():
+    rule = tlang.Terminal("a").T("1")
     assert ["1"] == list(rule.run("a"))
 
 
 def test_typed():
-    rule = tlang.Terminal("a").compT("1")
-    rule |= tlang.Terminal("a").compT("2")
+    rule = tlang.Terminal("a").T("1")
+    rule |= tlang.Terminal("a").T("2")
     print(rule)
     assert ["1", "2"] == list(rule.run("a"))
     assert ["1"] == list(
@@ -438,8 +438,7 @@ def test_stitch():
 
 
 def test_greedy():
-    rule = tlang.Greedy(tlang.Terminal("a")) + \
-        tlang.Greedy(tlang.wild).compT("")
+    rule = tlang.Greedy(tlang.Terminal("a")) + tlang.Greedy(tlang.wild).T("")
     test = "aaaaab"
     assert ["aaaaa"] == list(rule.run(test))
     test = "abaa"
@@ -475,6 +474,6 @@ def test_custom():
 
     rule += update
     rule = rule[:]
-    rule = rule.compT("[{p}]")
+    rule = rule.T("[{p}]")
     for test in ("a", "aa", "abc", "abbca", "ddadbc"):
         assert [str(list(test))] == list(rule.run(test))

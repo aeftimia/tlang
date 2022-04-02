@@ -5,8 +5,8 @@ digits = tlang.oneof("01")
 number = "1" + digits[:]
 leading = number.ref("leading")
 simple_even = leading + "0"
-even = number + "0" | simple_even.compT("10 * {leading}").reset()
-odd = number + "1" | (leading + "1").compT("({leading}0 + 1)").reset()
+even = number + "0" | simple_even.T("10 * {leading}").reset()
+odd = number + "1" | (leading + "1").T("({leading}0 + 1)").reset()
 constants = "1" | even | odd  # | '0'
 
 subexpr = "(" + tlang.Placeholder("expression").ref("content") + ")"
@@ -14,8 +14,8 @@ factor = constants | subexpr
 simple_product = (factor + (" * " + factor)[:]).reset()
 product = tlang.within(tlang.Terminal("1"), factor, " * ").reset()
 product = simple_product
-product |= simple_product.compT("{} * 1").reset()
-# product |= tlang.within(tlang.Terminal('0'), factor, ' * ').compT('0')
+product |= simple_product.T("{} * 1").reset()
+# product |= tlang.within(tlang.Terminal('0'), factor, ' * ').T('0')
 product |= tlang.both_within(
     tlang.Terminal("10"),
     number.ref("const"),
@@ -25,15 +25,15 @@ product |= tlang.both_within(
     "{const}0",
 ).reset()
 # distributive
-subbed = simple_product.compT("{common} * {}").reset()
+subbed = simple_product.T("{common} * {}").reset()
 sum_of_prod = (
     "(" + (subbed + (" + " + subbed)[:]) + ")").ref("distributed").reset()
 distribute = tlang.within(factor.ref("common"), factor, " * ")
-distribute *= sum_of_prod | tlang.within(sum_of_prod, factor, " * ").compT(
+distribute *= sum_of_prod | tlang.within(sum_of_prod, factor, " * ").T(
     "{} * {distributed}"
 )
 product |= distribute.reset()
-simplify_sum = subexpr.compT("{content}").reset()
+simplify_sum = subexpr.T("{content}").reset()
 summand = product | simplify_sum
 expression = summand + (" + " + summand)[:].reset()
 # expression |= tlang.within(tlang.Terminal('0'), summand, ' + ')
