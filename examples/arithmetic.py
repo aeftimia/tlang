@@ -1,4 +1,4 @@
-# Rewrite binary arithmetic expressions with Peano's axioms
+# Rewrite binary expressions with Peano's axioms
 import tlang
 
 digits = tlang.oneof("01")
