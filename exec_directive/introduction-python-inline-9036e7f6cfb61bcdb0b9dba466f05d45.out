@@ -1,4 +1,0 @@
-[('drop', immutables.Map({'': ''}))]
-[('drop', immutables.Map({'': ' * from table'}))]
-[('drop', immutables.Map({'': ' select *'}))]
-[('drop', immutables.Map({'': ' select *'}))]
