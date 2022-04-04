@@ -22,6 +22,8 @@ jobs:
       - run:
           name: Disable jekyll builds
           command: touch docs/html/.nojekyll
+      - run: mkdir -p docs/html/.circleci
+      - run: cp .circleci/config.yml docs/html/.circleci/config.yml
       - run:
           name: Install and configure dependencies
           command: |
