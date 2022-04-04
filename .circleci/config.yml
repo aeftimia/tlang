@@ -35,7 +35,7 @@ jobs:
             - "80:30:82:3d:5f:0b:19:f0:2c:27:f7:3b:d8:a2:a0:c0"
       - run:
           name: Deploy docs to gh-pages branch
-          command: gh-pages -b docs --dotfiles --message $(git log --format=%B -n 1) --dist docs/html
+          command: gh-pages -b docs --dotfiles --message "$(git log --format=%B -n 1)" --dist docs/html
 workflows:
   version: 2
   build:
