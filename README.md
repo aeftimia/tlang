@@ -1,4 +1,4 @@
-[![CircleCI](https://circleci.com/gh/aeftimia/tlang/tree/main.svg?style=svg)]
+![CircleCI](https://circleci.com/gh/aeftimia/tlang/tree/main.svg?style=svg)
 
 # Introduction
 
