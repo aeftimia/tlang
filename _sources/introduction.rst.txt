@@ -11,6 +11,24 @@ designed to be lightweight, and flexible. Recognizing it can't anticipate every
 possible usecase, Tlang aims to make it as simple as possible to define new
 parsers and operations that integrate nicely with its core constructs.
 
+Motivation and Backstory
+=============
+A few years ago, I was tasked with rewriting thousands of lines of SQL to fit a
+new table layout. Many columns had been moved and renamed to new tables, and
+sometimes their formats had been changed too. Fixing existing SQL scripts
+required identifying references to specific columns within specific tables and
+changing those refernences to point to new locations. It was too complicated
+for a find and replace because tables could be aliased, and a general solution
+needed to be able to track table names through aliases. Furthermore, if the
+data lived in a new table that was not part of the join, the join statement
+needed to be fixed. At the time, no good open source solutions to this kind of
+problem existed. Furthermore, I understood very little about parsing and
+compilers, and was very underqualified to write a general solution to this
+problem. While there are better tools for this kind of problem now, a more
+general problem still remained: How to write a useful yet maintainable
+transpiler without knowing much about compiler theory? Tlang aims to solve
+*that* problem.
+
 Implementation
 =============
 
@@ -73,6 +91,9 @@ very simple and self consistent framework that is designed to keep things
 simple when the going gets tough. The core framework really just consists of
 terminals, alterations, concatenations, composition, and a linking mechanism
 that allows for self reference. Everything else is a convenience.
+
+Download and ``pip install`` the latest code from `Github
+<https://github.com/aeftimia/tlang>`_.
 
 
 **********

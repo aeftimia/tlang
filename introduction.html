@@ -40,6 +40,7 @@
               <p class="caption" role="heading"><span class="caption-text">Overview</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Introduction</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#motivation-and-backstory">Motivation and Backstory</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#implementation">Implementation</a></li>
 </ul>
 </li>
@@ -96,6 +97,24 @@ left recursion, context sensitivity, ambiguity, and multiple passes. It is
 designed to be lightweight, and flexible. Recognizing it can’t anticipate every
 possible usecase, Tlang aims to make it as simple as possible to define new
 parsers and operations that integrate nicely with its core constructs.</p>
+<section id="motivation-and-backstory">
+<h2>Motivation and Backstory<a class="headerlink" href="#motivation-and-backstory" title="Permalink to this headline"></a></h2>
+<p>A few years ago, I was tasked with rewriting thousands of lines of SQL to fit a
+new table layout. Many columns had been moved and renamed to new tables, and
+sometimes their formats had been changed too. Fixing existing SQL scripts
+required identifying references to specific columns within specific tables and
+changing those refernences to point to new locations. It was too complicated
+for a find and replace because tables could be aliased, and a general solution
+needed to be able to track table names through aliases. Furthermore, if the
+data lived in a new table that was not part of the join, the join statement
+needed to be fixed. At the time, no good open source solutions to this kind of
+problem existed. Furthermore, I understood very little about parsing and
+compilers, and was very underqualified to write a general solution to this
+problem. While there are better tools for this kind of problem now, a more
+general problem still remained: How to write a useful yet maintainable
+transpiler without knowing much about compiler theory? Tlang aims to solve
+<em>that</em> problem.</p>
+</section>
 <section id="implementation">
 <h2>Implementation<a class="headerlink" href="#implementation" title="Permalink to this headline"></a></h2>
 <p>Tlang approaches building transpilers as an extension of context sensitive
@@ -153,6 +172,7 @@ very simple and self consistent framework that is designed to keep things
 simple when the going gets tough. The core framework really just consists of
 terminals, alterations, concatenations, composition, and a linking mechanism
 that allows for self reference. Everything else is a convenience.</p>
+<p>Download and <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span></code> the latest code from <a class="reference external" href="https://github.com/aeftimia/tlang">Github</a>.</p>
 </section>
 <section id="core-constructs">
 <h1>Core Constructs<a class="headerlink" href="#core-constructs" title="Permalink to this headline"></a></h1>
@@ -414,7 +434,7 @@ nonexistant key is referenced from the context.</p>
 []
 </pre></div>
 </div>
-<p>Composition with Templates is common enough we included <code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.T()</span></code>
+<p>Composition with Templates is common enough we included <a class="reference internal" href="core.html#tlang.core.Transpiler.T" title="tlang.core.Transpiler.T"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Transpiler.T()</span></code></a>
 as a shortcut. Note that empty delimiters denote the text passed to the
 template since the context key for the input string is an empty string.</p>
 <p>You can parse exact matches of the results of previous parses with <a class="reference internal" href="core.html#tlang.core.Ref" title="tlang.core.Ref"><code class="xref py py-class docutils literal notranslate"><span class="pre">Ref</span></code></a>.</p>
@@ -587,7 +607,7 @@ are or behave like <code class="docutils literal notranslate"><span class="pre">
 <span class="nb">print</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">read_context</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name3&#39;, &#39;name1&#39;})
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name1&#39;, &#39;name3&#39;})
 </pre></div>
 </div>
 <p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
