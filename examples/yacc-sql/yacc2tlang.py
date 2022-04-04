@@ -93,8 +93,7 @@ rule_assignment += (
     + (whitespaces + ";").T("")
 )
 rule_assignment += declare
-rule_assignment_lines = tlang.delimeted(
-    rule_assignment / comment, whitespaces.T("\n"))
+rule_assignment_lines = tlang.delimeted(rule_assignment / comment, whitespaces.T("\n"))
 token_line = comment / (token_assignment + pgreedy(newline))
 token_lines = pgreedy(token_line)
 start_lines = "%start"
@@ -145,8 +144,7 @@ tlang.test(
     {"/* test */": ["/* test */"]},
 )
 tlang.test(
-    comment, {"/* some \n comment */": [""],
-              "/* some comment */": ["# some comment\n"]}
+    comment, {"/* some \n comment */": [""], "/* some comment */": ["# some comment\n"]}
 )
 tlang.test(
     token_assignment,

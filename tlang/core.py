@@ -169,7 +169,7 @@ class Transpiler:
 
         Returns:
             Copy of self with specified alterations"""
-        args = new_args + tuple(self.args[len(new_args):])
+        args = new_args + tuple(self.args[len(new_args) :])  # noqa: E203
         kwargs = self.kwargs.copy()
         kwargs.update(new_kwargs)
         new = self.new(*args, **kwargs)
@@ -226,8 +226,7 @@ class Transpiler:
         if text is None:
             new = parses
         else:
-            new = ((output, context)
-                   for output, context in parses if context[""] == "")
+            new = ((output, context) for output, context in parses if context[""] == "")
         if return_context:
             return new
         return (s for s, c in new)
@@ -240,8 +239,7 @@ class Transpiler:
 
     def __repr__(self):
         args = ", ".join(map(repr, self.args))
-        kwargs = ", ".join(f"{key}={repr(value)}" for key,
-                           value in self.kwargs.items())
+        kwargs = ", ".join(f"{key}={repr(value)}" for key, value in self.kwargs.items())
         if kwargs:
             args += ", " + kwargs
         return f"{self.__class__.__name__}({args})"
@@ -561,7 +559,7 @@ class Terminal(Transpiler):
         else:
             test = tokens[: self.n]
             if test == self.text:
-                yield test, context.set("", tokens[self.n:])
+                yield test, context.set("", tokens[self.n :])  # noqa: E203
 
     def __add__(self, other):
         if isinstance(other, str):
@@ -636,8 +634,7 @@ class Reset(Wrapper):
     def process(self, original_context):
         masked = apply_mask(original_context, self.write_context)
         for output, context in self.parser(original_context):
-            pruned_modifications = diff(apply_mask(
-                context, self.write_context), masked)
+            pruned_modifications = diff(apply_mask(context, self.write_context), masked)
             yield output, merge(original_context, pruned_modifications)
 
 

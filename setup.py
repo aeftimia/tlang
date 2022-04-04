@@ -34,7 +34,7 @@ setup(
     ],
     package_data={},
     python_requires=">=3.8",
-    install_requires=["immutables", "pytest"],
+    install_requires=["immutables"],
     extras_require=extras_require,
     url="",
     project_urls={

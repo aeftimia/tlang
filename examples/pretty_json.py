@@ -48,11 +48,9 @@ def make_block(entry):
     return block
 
 
-json_formatter = "[" + make_block(value) + \
-    tlang.Terminal("]").T("\n{indent}{}")
+json_formatter = "[" + make_block(value) + tlang.Terminal("]").T("\n{indent}{}")
 key_value = string + delete_whitespace + ":" + whitespace.T(" ") + value
-json_formatter |= "{" + make_block(key_value) + \
-    tlang.Terminal("}").T("\n{indent}{}")
+json_formatter |= "{" + make_block(key_value) + tlang.Terminal("}").T("\n{indent}{}")
 json_formatter = json_formatter.recurrence("json")
 json_formatter |= empty
 json_formatter = delete_whitespace + json_formatter + delete_whitespace

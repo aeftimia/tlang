@@ -26,8 +26,7 @@ product |= tlang.both_within(
 ).reset()
 # distributive
 subbed = simple_product.T("{common} * {}").reset()
-sum_of_prod = (
-    "(" + (subbed + (" + " + subbed)[:]) + ")").ref("distributed").reset()
+sum_of_prod = ("(" + (subbed + (" + " + subbed)[:]) + ")").ref("distributed").reset()
 distribute = tlang.within(factor.ref("common"), factor, " * ")
 distribute *= sum_of_prod | tlang.within(sum_of_prod, factor, " * ").T(
     "{} * {distributed}"

@@ -24,16 +24,14 @@ def test_named_alt():
 
 def test_terminal():
     context = tlang.root_context.set("", "a")
-    assert [("a", tlang.root_context.set("", ""))] == list(
-        tlang.Terminal("a")(context))
+    assert [("a", tlang.root_context.set("", ""))] == list(tlang.Terminal("a")(context))
 
 
 def test_run():
     a = tlang.Terminal("a")
     assert ["a"] == list(a.run("a"))
     M = tlang.root_context.set("1", 2)
-    assert [("a", M.set("", ""))] == list(
-        a.run("a", context=M, return_context=True))
+    assert [("a", M.set("", ""))] == list(a.run("a", context=M, return_context=True))
     assert [] == list(a.run("ab", context=M))
     assert [] == list(a.run("b", context=M))
 
@@ -235,8 +233,7 @@ def test_typed():
     assert ["1"] == list(
         rule.recur(
             tlang.typed(
-                {tlang.Alteration: lambda x: tlang.PEGAlteration(
-                    (x.left, x.right))}
+                {tlang.Alteration: lambda x: tlang.PEGAlteration((x.left, x.right))}
             )
         ).run("a")
     )

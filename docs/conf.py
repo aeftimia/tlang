@@ -73,14 +73,8 @@ html_theme_options = {
 # A fix for Sphinx error contents.rst not found
 master_doc = "index"
 
-# increase the timeout for long running notebooks
-nbsphinx_timeout = 180
-
 # Don't show full paths
 add_module_names = False
-
-# bibtex
-# bibtex_bibfiles = ["refs.bib"]
 
 source_suffix = {
     ".rst": "restructuredtext",
