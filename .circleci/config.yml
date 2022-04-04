@@ -18,7 +18,7 @@ jobs:
     steps:
       - checkout
       - attach_workspace:
-          at: docs/html
+          at: docs
       - run:
           name: Disable jekyll builds
           command: touch docs/html/.nojekyll
