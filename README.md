@@ -1,3 +1,5 @@
+[![CircleCI](https://circleci.com/gh/aeftimia/tlang/tree/main.svg?style=svg)]
+
 # Introduction
 
 Tlang is a DSL designed to quickly build readable and maintainable transpilers.
