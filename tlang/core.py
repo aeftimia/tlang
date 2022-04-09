@@ -22,6 +22,7 @@ class CachedParse:
             # from this very generator?
             for output, modifications in self.cache[i:]:
                 yield output, merge(context, modifications)
+                i += 1
             output, context = parse
             cache_entry = (output, diff(context, self.initial_context))
             self.cache.append(cache_entry)

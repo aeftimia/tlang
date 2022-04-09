@@ -56,12 +56,33 @@ def test_right_recursion():
 
 
 def test_left_recursion():
-    rule = (tlang.Placeholder("r") + tlang.Terminal("a")) | tlang.Terminal("b")
+    rule = tlang.Placeholder("r") + "a" | "b"
     rule = rule.recurrence("r")
     assert ["ba"] == list(rule.run("ba"))
     assert ["baa"] == list(rule.run("baa"))
     assert ["baaa"] == list(rule.run("baaa"))
     assert [] == list(rule.run("a"))
+    assert [] == list(rule.run("c"))
+
+
+def test_left_recursion2():
+    rule = tlang.Placeholder("r") + "a" | "c" | "b"
+    rule = rule.recurrence("r")
+    assert ["ba"] == list(rule.run("ba"))
+    assert ["baa"] == list(rule.run("baa"))
+    assert ["baaa"] == list(rule.run("baaa"))
+    assert [] == list(rule.run("a"))
+    assert [] == list(rule.run("d"))
+
+
+def test_left_recursion3():
+    rule = tlang.Placeholder("r") + "a" | "b" | "c"
+    rule = rule.recurrence("r")
+    assert ["ba"] == list(rule.run("ba"))
+    assert ["baa"] == list(rule.run("baa"))
+    assert ["baaa"] == list(rule.run("baaa"))
+    assert [] == list(rule.run("a"))
+    assert [] == list(rule.run("d"))
 
 
 def test_comp():
