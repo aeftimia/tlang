@@ -5,24 +5,19 @@ from collections import deque as _deque
 from immutables import Map as _Map
 from functools import lru_cache as _lru_cache, singledispatch as _singledispatch
 
-
 class CachedParse:
-    def __init__(self, generator, initial_context, t):
+    def __init__(self, generator, initial_context):
         self.generator = iter(generator)
         self.initial_context = initial_context
         self.cache = []
-        self.t = t
 
-    def run(self, context):
+    def run(self, context, cache_only=False):
         for output, modifications in self.cache:
             yield output, merge(context, modifications)
+        if cache_only:
+            return
         i = len(self.cache)
         for parse in self.generator:
-            # what if this parse was taken
-            # from this very generator?
-            for output, modifications in self.cache[i:]:
-                yield output, merge(context, modifications)
-                i += 1
             output, context = parse
             cache_entry = (output, diff(context, self.initial_context))
             self.cache.append(cache_entry)
@@ -505,12 +500,8 @@ class Cached(Transpiler):
         """Parse, cache, yield, gaurd for infinite loops."""
         cache_key = apply_mask(context, self.read_context)
         if cache_key not in self.cache:
-            self.cache[cache_key] = CachedParse(self.process(context), context, self)
-        try:
-            yield from self.cache[cache_key].run(context)
-        except ValueError:
-            del self.cache[cache_key]
-            raise
+            self.cache[cache_key] = CachedParse(self.process(context), context)
+        return self.cache[cache_key].run(context)
 
 
 class Template(Transpiler):
@@ -753,19 +744,30 @@ class Combinator(Cached):
 class Alteration(Combinator):
 
     nil = nope
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.gaurd = set()
 
-    def process(self, context, reverse=False):
-        infiniteloop = False
-        try:
-            yield from self.left(context)
-        except ValueError:
-            infiniteloop = True
-        yield from self.right(context)
-        if infiniteloop:
+    def __call__(self, context):
+        """Parse, cache, yield, gaurd for infinite loops."""
+        cache_key = apply_mask(context, self.read_context)
+        if cache_key not in self.cache:
+            self.cache[cache_key] = CachedParse(self.process(context), context)
+        if cache_key in self.gaurd and context[""] is not None:
+            self.gaurd.discard(cache_key)
+            yield from self.right(context)
             try:
                 yield from self.left(context)
             except ValueError:
-                return
+                pass
+        else:
+            self.gaurd.add(cache_key)
+            yield from self.cache[cache_key].run(context)
+            self.gaurd.discard(cache_key)
+
+    def process(self, context):
+        yield from self.left(context)
+        yield from self.right(context)
 
 
 class PEGAlteration(Combinator):
