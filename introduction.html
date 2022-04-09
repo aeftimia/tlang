@@ -92,11 +92,11 @@
   <section id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline"></a></h1>
 <p>Tlang is a DSL designed to make writing readable mainainable transpilers less
-impossible. Tlang is a minimal framework within Python that seamlessly handles
-left recursion, context sensitivity, ambiguity, and multiple passes. It is
-designed to be lightweight, and flexible. Recognizing it can’t anticipate every
-possible usecase, Tlang aims to make it as simple as possible to define new
-parsers and operations that integrate nicely with its core constructs.</p>
+impossible. It seamlessly handles left recursion, context sensitivity,
+ambiguity, and multiple passes. Tlang is designed to be lightweight, and
+flexible. Recognizing it can’t anticipate every possible usecase, Tlang aims to
+make it as simple as possible to define new parsers and operations that
+integrate nicely with its core constructs.</p>
 <section id="motivation-and-backstory">
 <h2>Motivation and Backstory<a class="headerlink" href="#motivation-and-backstory" title="Permalink to this headline"></a></h2>
 <p>A few years ago, I was tasked with rewriting thousands of lines of SQL to fit a
@@ -121,7 +121,7 @@ transpiler without knowing much about compiler theory? Tlang aims to solve
 parsing by allowing parsers to compose. The underlying parser is probably best
 described as a scannerless context sensitive packrat parser that handles left
 recursion and ambiguity. Rather than returning one parse, parsers return
-generators. Alterations catch an <cite>ValueError</cite> raised by generators upon reentry
+generators. Alterations catch a <cite>ValueError</cite> raised by generators upon reentry
 and reverse the order of their branches accordingly. The parser essentially
 reduces to a packrat parser for PEG grammars.</p>
 <p>Tlang defines a parser as a map from a context object (in our case a <a class="reference external" href="https://en.wikipedia.org/wiki/Hash_array_mapped_trie">Hash
@@ -181,13 +181,12 @@ that allows for self reference. Everything else is a convenience.</p>
 <p>Transpilers created with Tlang are designed to ingest context objects and
 return a generator of tuples containing output strings and new context objects.
 Context objects are immutable maps currently powered by <a class="reference external" href="https://github.com/MagicStack/immutables">MagicStack’s
-immutables.Map</a>. We hope to
-customize this implementation in future releases.  The context object stores
-the input string under the <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> key. The input string is generally your
-source code, and output strings are one or more new versions of your code. Like
-writing a <a class="reference external" href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form">BNF</a> spec,
-Tlang allows you to specify terminals, and combine rules with alterations and
-concatenations.</p>
+immutables.Map</a>. The context object
+stores the input string under the <code class="docutils literal notranslate"><span class="pre">&quot;&quot;</span></code> key. The input string is generally
+your source code, and output strings are one or more new versions of your code.
+Like writing a <a class="reference external" href="https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form">BNF</a>
+spec, Tlang allows you to specify terminals, and combine rules with alterations
+and concatenations.</p>
 <p>Let’s start with a simple example.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tlang</span>
 
@@ -607,7 +606,7 @@ are or behave like <code class="docutils literal notranslate"><span class="pre">
 <span class="nb">print</span><span class="p">(</span><span class="n">rule</span><span class="o">.</span><span class="n">read_context</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name3&#39;, &#39;name1&#39;})
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>frozenset({&#39;name1&#39;, &#39;name3&#39;})
 </pre></div>
 </div>
 <p>Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime

@@ -5,11 +5,11 @@ Introduction
 .. currentmodule:: tlang.core
 
 Tlang is a DSL designed to make writing readable mainainable transpilers less
-impossible. Tlang is a minimal framework within Python that seamlessly handles
-left recursion, context sensitivity, ambiguity, and multiple passes. It is
-designed to be lightweight, and flexible. Recognizing it can't anticipate every
-possible usecase, Tlang aims to make it as simple as possible to define new
-parsers and operations that integrate nicely with its core constructs.
+impossible. It seamlessly handles left recursion, context sensitivity,
+ambiguity, and multiple passes. Tlang is designed to be lightweight, and
+flexible. Recognizing it can't anticipate every possible usecase, Tlang aims to
+make it as simple as possible to define new parsers and operations that
+integrate nicely with its core constructs.
 
 Motivation and Backstory
 =============
@@ -36,7 +36,7 @@ Tlang approaches building transpilers as an extension of context sensitive
 parsing by allowing parsers to compose. The underlying parser is probably best
 described as a scannerless context sensitive packrat parser that handles left
 recursion and ambiguity. Rather than returning one parse, parsers return
-generators. Alterations catch an `ValueError` raised by generators upon reentry
+generators. Alterations catch a `ValueError` raised by generators upon reentry
 and reverse the order of their branches accordingly. The parser essentially
 reduces to a packrat parser for PEG grammars.
 
@@ -106,13 +106,12 @@ Terminals
 Transpilers created with Tlang are designed to ingest context objects and
 return a generator of tuples containing output strings and new context objects.
 Context objects are immutable maps currently powered by `MagicStack's
-immutables.Map <https://github.com/MagicStack/immutables>`_. We hope to
-customize this implementation in future releases.  The context object stores
-the input string under the ``""`` key. The input string is generally your
-source code, and output strings are one or more new versions of your code. Like
-writing a `BNF <https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>`_ spec,
-Tlang allows you to specify terminals, and combine rules with alterations and
-concatenations.
+immutables.Map <https://github.com/MagicStack/immutables>`_. The context object
+stores the input string under the ``""`` key. The input string is generally
+your source code, and output strings are one or more new versions of your code.
+Like writing a `BNF <https://en.wikipedia.org/wiki/Backus%E2%80%93Naur_form>`_
+spec, Tlang allows you to specify terminals, and combine rules with alterations
+and concatenations.
 
 Let's start with a simple example.
 
@@ -552,7 +551,7 @@ Enter the following decorators.
 
     * :func:`transpiler()` for general transpilers
     * :func:`contextonly()` for transpilers that output the empty string
-    * :func:`contextfree` for transpilers that only read the input string
+    * :func:`contextfree()` for transpilers that only read the input string
 
 You can use :func:`transpiler()` for anything you can use :func:`contextonly()`
 and :func:`contextfree()` for, but the latter make their respective use cases
