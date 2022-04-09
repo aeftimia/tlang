@@ -56,9 +56,7 @@ def test_right_recursion():
 
 
 def test_left_recursion():
-    rule = (
-        tlang.Decache.new(tlang.Placeholder("r") + tlang.Terminal("a"))
-    ) | tlang.Terminal("b")
+    rule = (tlang.Placeholder("r") + tlang.Terminal("a")) | tlang.Terminal("b")
     rule = rule.recurrence("r")
     assert ["ba"] == list(rule.run("ba"))
     assert ["baa"] == list(rule.run("baa"))

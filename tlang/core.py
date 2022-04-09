@@ -7,10 +7,11 @@ from functools import lru_cache as _lru_cache, singledispatch as _singledispatch
 
 
 class CachedParse:
-    def __init__(self, generator, initial_context):
+    def __init__(self, generator, initial_context, t):
         self.generator = iter(generator)
         self.initial_context = initial_context
         self.cache = []
+        self.t = t
 
     def run(self, context):
         for output, modifications in self.cache:
@@ -503,8 +504,12 @@ class Cached(Transpiler):
         """Parse, cache, yield, gaurd for infinite loops."""
         cache_key = apply_mask(context, self.read_context)
         if cache_key not in self.cache:
-            self.cache[cache_key] = CachedParse(self.process(context), context)
-        return self.cache[cache_key].run(context)
+            self.cache[cache_key] = CachedParse(self.process(context), context, self)
+        try:
+            yield from self.cache[cache_key].run(context)
+        except ValueError:
+            del self.cache[cache_key]
+            raise
 
 
 class Template(Transpiler):
