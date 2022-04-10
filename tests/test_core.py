@@ -113,6 +113,14 @@ def test_gen():
             assert p == e
 
 
+def test_left_gen():
+    rule = tlang.Placeholder("r") + "a" | "b"
+    rule = rule.recurrence("r")
+    language = rule.run()
+    for i in range(1, 4):
+        assert next(language) == "b" + "a" * i
+
+
 def test_cache_key():
     lookup = Map(
         {

@@ -5,6 +5,7 @@ from collections import deque as _deque
 from immutables import Map as _Map
 from functools import lru_cache as _lru_cache, singledispatch as _singledispatch
 
+
 class CachedParse:
     def __init__(self, generator, initial_context):
         self.generator = iter(generator)
@@ -134,7 +135,6 @@ class Transpiler:
         self.kwargs = kwargs
         self.args = list(args)
         self.init_context = root_context
-        self.prev = self
 
     def __eq__(self, other):
         if type(self) is not type(other):
@@ -200,6 +200,9 @@ class Transpiler:
         print(self)
         raise NotImplementedError
 
+    def gen(self, context):
+        return self.process(context)
+
     def run(self, text=None, context=None, return_context=False):
         """Transpile text, returning only output strings (optionally with final
             context) of complete parses.
@@ -242,6 +245,8 @@ class Transpiler:
         return f"{self.__class__.__name__}({args})"
 
     def __call__(self, context):
+        if context[""] is None:
+            return self.gen(context)
         return self.process(context)
 
     def comp(self, other):
@@ -498,9 +503,10 @@ class Cached(Transpiler):
 
     def __call__(self, context):
         """Parse, cache, yield, gaurd for infinite loops."""
+        process = self.gen if context[""] is None else self.process
         cache_key = apply_mask(context, self.read_context)
         if cache_key not in self.cache:
-            self.cache[cache_key] = CachedParse(self.process(context), context)
+            self.cache[cache_key] = CachedParse(process(context), context)
         return self.cache[cache_key].run(context)
 
 
@@ -545,18 +551,14 @@ class Terminal(Transpiler):
         self.n = len(text)
         self.text = text
 
+    def gen(self, context):
+        yield self.text, context
+
     def process(self, context):
-        try:
-            tokens = context[""]
-        except KeyError:
-            return
-        # generative mode
-        if tokens is None:
-            yield self.text, context
-        else:
-            test = tokens[: self.n]
-            if test == self.text:
-                yield test, context.set("", tokens[self.n :])  # noqa: E203
+        tokens = context[""]
+        test = tokens[: self.n]
+        if test == self.text:
+            yield test, context.set("", tokens[self.n :])  # noqa: E203
 
     def __add__(self, other):
         if isinstance(other, str):
@@ -744,6 +746,7 @@ class Combinator(Cached):
 class Alteration(Combinator):
 
     nil = nope
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.gaurd = set()
@@ -755,15 +758,21 @@ class Alteration(Combinator):
             self.cache[cache_key] = CachedParse(self.process(context), context)
         if cache_key in self.gaurd and context[""] is not None:
             self.gaurd.discard(cache_key)
-            yield from self.right(context)
-            try:
-                yield from self.left(context)
-            except ValueError:
-                pass
+            yield from self.switch(context)
         else:
             self.gaurd.add(cache_key)
-            yield from self.cache[cache_key].run(context)
+            try:
+                yield from self.cache[cache_key].run(context)
+            except ValueError:
+                yield from self.switch(context)
             self.gaurd.discard(cache_key)
+
+    def switch(self, context):
+        yield from self.right(context)
+        try:
+            yield from self.left(context)
+        except ValueError:
+            pass
 
     def process(self, context):
         yield from self.left(context)
@@ -773,6 +782,10 @@ class Alteration(Combinator):
 class PEGAlteration(Combinator):
 
     nil = nope
+
+    def gen(self, context):
+        yield from self.left(context)
+        yield from self.right(context)
 
     def process(self, context):
         found = False
@@ -827,11 +840,10 @@ class Completed(Wrapper):
     """Prune incomplete parses. Similar to ``run`` but as a full transpiler
     that returns the (empty) string of remaining characters as well"""
 
+    def gen(self, context):
+        return self.parser(context)
+
     def process(self, context):
-        tokens = context[""]
-        if tokens is None:
-            yield from self.parser(context)
-            return
         for parse in self.parser(context):
             output, context = parse
             if context[""] == "":
