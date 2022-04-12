@@ -20,7 +20,7 @@ setup(
     name="tlang",
     description="Transpiler Generator",
     version=__version__,
-    license="Apache-2.0",
+    license="MIT",
     author="Alex Eftimiades",
     author_email="alexeftimiades@gmail.com",
     long_description=long_description,
@@ -28,7 +28,7 @@ setup(
     packages=find_packages(exclude=["examples"]),
     classifiers=[
         "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: Apache Software License",
+        "License :: OSI Approved :: MIT Software License",
         "Operating System :: MacOS",
         "Operating System :: POSIX :: Linux",
     ],
