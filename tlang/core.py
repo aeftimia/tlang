@@ -949,6 +949,12 @@ def greedy(parser):
     return new.recurrence(parser)
 
 
+def pgreedy(parser):
+    """Performant greedy that decaches before creating greedy repetition. Do
+    not use this if the parser involves any form of left recursion."""
+    return Greedy(decache(parser))
+
+
 def contextfree(parser):
     """Create a context free transpiler.
 
