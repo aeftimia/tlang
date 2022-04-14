@@ -1024,6 +1024,12 @@
     <span class="k">return</span> <span class="n">new</span><span class="o">.</span><span class="n">recurrence</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span></div>
 
 
+<div class="viewcode-block" id="pgreedy"><a class="viewcode-back" href="../../core.html#tlang.core.pgreedy">[docs]</a><span class="k">def</span> <span class="nf">pgreedy</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Performant greedy that decaches before creating greedy repetition. Do</span>
+<span class="sd">    not use this if the parser involves any form of left recursion.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="n">Greedy</span><span class="p">(</span><span class="n">decache</span><span class="p">(</span><span class="n">parser</span><span class="p">))</span></div>
+
+
 <div class="viewcode-block" id="contextfree"><a class="viewcode-back" href="../../core.html#tlang.core.contextfree">[docs]</a><span class="k">def</span> <span class="nf">contextfree</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Create a context free transpiler.</span>
 
