@@ -24,7 +24,7 @@ def declare(context):
 def create_lookup(context):
     lookup = ""
     for name in context["declared"]:
-        lookup += f'    "{name}": {name},\n'
+        lookup += f'    "{name}": {name}.recur(skip),\n'
     yield context.set("lookup", lookup)
 
 
@@ -111,8 +111,21 @@ alteration = tlang.delimeted(concatenation, pipe.T(" / "), cache=True)
 alteration = alteration.recurrence("alteration")
 curly = tlang.Terminal("}")
 code = "{" + tlang.pgreedy(curly.inv()) + curly
-channel = "channel(" + rule_name + ")"
-action = "->" + maybe_comments + channel / "skip"
+@tlang.contextonly(["hidden"])
+def skip_rules(context):
+    if "hidden" in context:
+        yield context.set("skip_rules", " / ".join(context["hidden"]))
+    else:
+        yield context.set("skip_rules", "tlang.nope")
+@tlang.contextonly(["name", "hidden"])
+def hide(context):
+    context = tlang.set_scoped(context, ("hidden", context["name"]), None)
+    yield context
+
+hidden = tlang.Terminal("channel(HIDDEN)") / "skip" + hide
+channel = ("channel(" + rule_name + ")") / "skip"
+channel *= hidden / tlang.identity
+action = "->" + maybe_comments + channel
 action /= code
 semi = tlang.Terminal(";").T("")
 rule_assignment = (
@@ -134,13 +147,13 @@ header = "grammar" + whitespace + whitespaces + rule_name + whitespaces + semi
 body = maybe_comments + header.T("")
 body += maybe_comments + rule_assignments / tlang.null
 body += maybe_comments
-body += create_lookup
+body += skip_rules + create_lookup
 template = r"""import tlang
 
-whitespace = tlang.Terminal('\n') / ' ' / '\t' / '\r' / '\f'
-whitespaces = tlang.pgreedy(whitespace)
-
 {{}}
+
+skip_rules = {{skip_rules}}
+skip = tlang.typed({tlang.Terminal: lambda t: t / skip_rules})
 
 lookup = {
 {{lookup}}
