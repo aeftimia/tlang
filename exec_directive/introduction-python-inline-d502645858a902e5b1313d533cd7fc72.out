@@ -1,3 +1,0 @@
-[('select', immutables.Map({'': ''}))]
-[('select', immutables.Map({'': ' * from table'}))]
-[]

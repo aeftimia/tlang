@@ -5,11 +5,14 @@ Introduction
 .. currentmodule:: tlang.core
 
 Tlang is a DSL designed to make writing readable mainainable transpilers less
-impossible. It seamlessly handles left recursion, context sensitivity,
-ambiguity, and multiple passes. Tlang is designed to be lightweight, and
-flexible. Recognizing it can't anticipate every possible usecase, Tlang aims to
-make it as simple as possible to define new parsers and operations that
-integrate nicely with its core constructs.
+impossible. For those less familiar with compilers, it helps you build robust
+readable systems that perform complex string substitutions (imagine
+automatically refactoring code in predefined ways). For those familiar with
+parsing and compilers, it seamlessly handles left recursion, context
+sensitivity, ambiguity, and multiple passes. Tlang is designed to be
+lightweight, and flexible. Recognizing it can't anticipate every possible
+usecase, Tlang aims to make it as simple as possible to define new parsers and
+operations that integrate nicely with its core constructs.
 
 Motivation and Backstory
 =============
@@ -27,7 +30,8 @@ compilers, and was very underqualified to write a general solution to this
 problem. While there are better tools for this kind of problem now, a more
 general problem still remained: How to write a useful yet maintainable
 transpiler without knowing much about compiler theory? Tlang aims to solve
-*that* problem.
+*that* problem with minimal complexity, and background knowledge. Tlang just
+assumes you're familiar with basic Python constructs.
 
 Implementation
 =============
@@ -86,11 +90,9 @@ escaping newlines) while formatting whitespace.
     definition *= tlang.Template("def {name}({args}):\n  return {content}")
     print(list(definition.run("add  =   lambda   x ,  y :     x + y")))
 
-Some of the conventions may seem arbitrary and adhoc, but under the hood is a
-very simple and self consistent framework that is designed to keep things
-simple when the going gets tough. The core framework really just consists of
-terminals, alterations, concatenations, composition, and a linking mechanism
-that allows for self reference. Everything else is a convenience.
+The core framework really just consists of terminals, alterations,
+concatenations, composition, and a linking mechanism that allows for self
+reference. Everything else is a convenience.
 
 Download and ``pip install`` the latest code from `Github
 <https://github.com/aeftimia/tlang>`_.
@@ -187,6 +189,40 @@ statement, and just chains the generators returned by its children together.
     print(list(select(Map({"": "select * from table"}))))
     print(list(select(Map({"": "from table select *"}))))
 
+
+Note that alterations can lead to multiple matches (what are known as
+"ambiguities").
+
+
+.. exec::
+
+    import tlang
+    from immutables import Map
+
+    select = tlang.Terminal("select")
+    select_from_stuff = tlang.Terminal("select from table")
+    statement = select | select_from_stuff
+    print(list(statement(Map({"": "select"}))))
+    print(list(statement(Map({"": "select from table"}))))
+    print(list(statement(Map({"": "from table select *"}))))
+
+Sometimes it's useful to return the first of multiple possible matches. As is
+customary, this `PEG
+<https://en.wikipedia.org/wiki/Parsing_expression_grammar>`_ alteration is
+introduced with the division operator.
+
+.. exec::
+
+    import tlang
+    from immutables import Map
+
+    select = tlang.Terminal("select")
+    select_from_stuff = tlang.Terminal("select from table")
+    statement = select / select_from_stuff
+    print(list(statement(Map({"": "select"}))))
+    print(list(statement(Map({"": "select from table"}))))
+    print(list(statement(Map({"": "from table select *"}))))
+
 Tlang uses list comprehension syntax for repetition. The start index specifies
 the minimum number of repetitions, the end index specifies the maximum number
 of repetitions, and the step size specifies the same.
@@ -208,40 +244,30 @@ of repetitions, and the step size specifies the same.
     print(list(a.run('aaaaa')))
 
 .. note::
-   Repetitions can be recursive or loopy, and greedy or not. All have
-   advantages and disadvantages. List comprehension implements loopy non-greedy
-   repetition. You can access the API for the four implementations directly at
-   :class:`Repetition`, :class:`Greedy`, :func:`repetition`, :func:`greedy`.
-   For maximum performance on long repetitions, apply :func:`decache` to remove any
-   caching from the parser to be repeated before creating the repetition.
-   Generally, using recursive repetitions works nicely with macros but will
-   blow out your stack with many consecutive matches. Greedy repetitions just
-   give you the longest match, which is fast and efficient. Nongreedy
-   repetitions are useful for ambiguous situations. Both can lead to
-   counterintuitive situations if you're not careful. For maximum performance,
-   use :class:`Greedy` or :func:`greedy` after applying :func:`decache`.
+    Repetitions can be recursive or loopy, and greedy or not. All have
+    advantages and disadvantages. List comprehension implements loopy non-greedy
+    repetition. You can access the API for the four implementations directly at
+    :class:`Repetition`, :class:`Greedy`, :func:`repetition`, :func:`greedy`.
+    For maximum performance on long repetitions, apply :func:`decache` to remove any
+    caching from the parser to be repeated before creating the repetition.
+    Recursive repetitions works nicely with macros but will blow out your stack
+    with many consecutive matches. Greedy repetitions just give you the longest
+    match, which is fast and efficient. Nongreedy repetitions are useful for
+    ambiguous situations. Both can lead to counterintuitive situations if you're
+    not careful. For maximum performance, use :class:`Greedy` or :func:`greedy`
+    after applying :func:`decache`. This is provided as :func:`pgreedy`. Be
+    careful however. Left recursive grammars need caching to prevent infinite
+    loops and must remain cached.
 
-Sometimes it's useful to return the first of multiple matches. As is customary,
-this `PEG <https://en.wikipedia.org/wiki/Parsing_expression_grammar>`_
-alteration is introduced with the division operator.
 
-.. exec::
+Composition and Context Sensitivity
+==================================
 
-    import tlang
-    from immutables import Map
-
-    select = tlang.Terminal("select")
-    from_stuff = tlang.Terminal("from table")
-    statement = select / from_stuff
-    print(list(select(Map({"": "select"}))))
-    print(list(select(Map({"": "select * from table"}))))
-    print(list(select(Map({"": "from table select *"}))))
-
-At this point, you're might be wondering how Tlang is different from a parser
-generator framework that returns strings instead of parse trees. Because the
-output of Tlang parsers shares the same type as its input string, Tlang parsers
-can be composed seamlessly. Compositions (in conjuction with lookaheads) can be
-used to specify a superset of `Boolean grammars
+At this point, Tlang probably looks like a goofy parser generator framework
+that returns strings instead of parse trees. Because the output of Tlang
+parsers shares the same type as its input string, Tlang parsers can be composed
+with the multiplication operator seamlessly. Compositions (in conjuction with
+lookaheads) can be used to specify a superset of `Boolean grammars
 <https://en.wikipedia.org/wiki/Boolean_grammar>`_.
 
 .. exec::
@@ -260,10 +286,6 @@ used to specify a superset of `Boolean grammars
 This composition is effectively parsing "select" or "from stuff" and then just
 "select" out of that result. This is of course equivalent to just parsing
 "select".
-
-
-Templates and References
-==========
 
 To make use of this concept for transpilation, we introduce our first context
 sensitive parser: the :class:`Template`.
@@ -331,7 +353,7 @@ Composition with Templates is common enough we included :meth:`Transpiler.T`
 as a shortcut. Note that empty delimiters denote the text passed to the
 template since the context key for the input string is an empty string.
 
-You can parse exact matches of the results of previous parses with :class:`Ref`.
+You can also match a substring that ocurred earlier with :class:`Ref`.
 
 .. exec::
 
@@ -345,7 +367,6 @@ You can parse exact matches of the results of previous parses with :class:`Ref`.
    print(list(factor.run("x^2 + y^2 + 2xy")))
    print(list(factor.run("y^2 + x^2 + 2yx")))
    print(list(factor.run("y^2 + x^2 + 2xx")))
-
 
 
 Recursion
@@ -475,11 +496,9 @@ Under the hood, transpilers work similar to packrat parser generators. There
 are of course more Tlang transpiler primitives than in most implementations of
 packrat parser generators, and Tlang's parsers can be context sensitive as well.
 In practice, this means some piece of the context is cached as well as the
-input text. However, you may notice that for every transpiler but :class:`Lazy`
-one can deduce what information the transpiler needs to read and write to
-without running it on any inputs. This sort of static analysis is handled under
-the hood within Tlang. Every transpiler has a ``read_context`` attribute. These
-are or behave like ``frozenset`` s.
+input text. However every transpiler can deduce what keys will be read from the
+context ahead of time.  This information is stored in that transpiler's
+``read_context`` attribute. These are or behave like ``frozenset`` s.
 
 .. exec::
 
@@ -489,13 +508,14 @@ are or behave like ``frozenset`` s.
     print(rule.read_context)
 
 
-Why? Under the hood, transpilers that are not guaranteed to be O(1) runtime
-(e.g. :class:`Combinator` instances) will attempt to cache their operations.
-These transpilers use their ``read_context`` in conjunction with the context it
-receives to derive a key for its own cache. They likewise derive the piece of
-output context stored within the cache from the write_context. This is
-respectively merged with the true input context upon cache lookups to simulate
-a true execution.
+Under the hood, transpilers that are not guaranteed to be O(1) runtime
+(e.g. :class:`Combinator` instances and more generally any subclass of
+:class:`Cached`) will attempt to cache their operations.  These transpilers use
+their ``read_context`` in conjunction with the context it receives to derive a
+key for its own cache. They likewise only cache the pieces of the context that
+have been changed (in addtion to the output string) and apply those changes to
+future inputs that hit the cache. This allows cached transpilers to maximize
+cache hits while simulating the full effect of the parser.
 
 Combinators (like alterations, concatenations, and compositions) effectively
 union child ``read_context`` attributes since caching them needs to cover all
