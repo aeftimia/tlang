@@ -31,15 +31,10 @@ def create_lookup(context):
 
 newline = tlang.Terminal("\n")
 not_newline = newline.inv()
-# performant greedy
 
 
-def pgreedy(t):
-    return tlang.Greedy(tlang.decache(t))
-
-
-var_name = not_newline + pgreedy(not_newline)
-build_python_name = tlang.digit.T("var_{}") / tlang.null + pgreedy(
+var_name = not_newline + tlang.pgreedy(not_newline)
+build_python_name = tlang.digit.T("var_{}") / tlang.null + tlang.pgreedy(
     tlang.alphanum / tlang.wild.T("_")
 )
 python_from_token = var_name.ref("terminal string") * build_python_name
@@ -50,15 +45,15 @@ token_assignment *= tlang.Template(
 )
 token_assignment += declare
 whitespace = tlang.Terminal("\n") / " " / "\t" / "\r" / "\f"
-whitespaces = pgreedy(whitespace)
+whitespaces = tlang.pgreedy(whitespace)
 remove_whitespaces = whitespaces.T("")
 quote = tlang.Terminal("'")
-quoted = quote + pgreedy((tlang.Terminal("\\") + quote) / quote.inv()) + quote
+quoted = quote + tlang.pgreedy((tlang.Terminal("\\") + quote) / quote.inv()) + quote
 quoted = quoted.T("tlang.Terminal({}) + whitespaces")
 start_comment = tlang.Terminal("/*")
 end_comment = tlang.Terminal("*/")
 single_line_comment = start_comment
-content = pgreedy((newline / end_comment).inv())
+content = tlang.pgreedy((newline / end_comment).inv())
 
 
 @tlang.contextfree
@@ -72,12 +67,12 @@ single_line_comment += content
 single_line_comment += end_comment
 single_line_comment *= tlang.Template("# {slc}\n")
 multi_line_comment = start_comment
-multi_line_comment += pgreedy(end_comment.inv())
+multi_line_comment += tlang.pgreedy(end_comment.inv())
 multi_line_comment += end_comment
 comment = single_line_comment / multi_line_comment.T("")
 comment = remove_whitespaces + comment + remove_whitespaces
 varchar = tlang.alphanum / "_" / "-" / "."
-rule_name = varchar + pgreedy(varchar)
+rule_name = varchar + tlang.pgreedy(varchar)
 rule_name *= build_python_name
 referenced = rule_name * reference
 rule_or_token = referenced / quoted / single_line_comment.T("tlang.null")
@@ -94,15 +89,15 @@ rule_assignment += (
 )
 rule_assignment += declare
 rule_assignment_lines = tlang.delimeted(rule_assignment / comment, whitespaces.T("\n"))
-token_line = comment / (token_assignment + pgreedy(newline))
-token_lines = pgreedy(token_line)
+token_line = comment / (token_assignment + tlang.pgreedy(newline))
+token_lines = tlang.pgreedy(token_line)
 start_lines = "%start"
 start_lines += whitespaces
 start_lines += rule_name.ref("start")
-start_lines += pgreedy(tlang.Terminal("%%").inv())
+start_lines += tlang.pgreedy(tlang.Terminal("%%").inv())
 end_header = tlang.Terminal("%}")
-header = tlang.Terminal("%{") + pgreedy(end_header.inv()) + end_header
-header_lines = pgreedy(comment) + header.T("")
+header = tlang.Terminal("%{") + tlang.pgreedy(end_header.inv()) + end_header
+header_lines = tlang.pgreedy(comment) + header.T("")
 body = header_lines
 body += whitespaces + token_lines
 body += (whitespaces + start_lines).T("")
@@ -112,12 +107,8 @@ body += create_lookup
 transpiler = body.T(
     r"""import tlang
 
-# performant greedy
-def pgreedy(t):
-    return tlang.Greedy(tlang.decache(t))
-
 whitespace = tlang.Terminal('\n') / ' ' / '\t' / '\r' / '\f'
-whitespaces = pgreedy(whitespace)
+whitespaces = tlang.pgreedy(whitespace)
 
 {{}}
 
@@ -140,7 +131,7 @@ tlang.test(
     },
 )
 tlang.test(
-    start_comment + pgreedy(end_comment.inv()) + end_comment,
+    start_comment + tlang.pgreedy(end_comment.inv()) + end_comment,
     {"/* test */": ["/* test */"]},
 )
 tlang.test(
