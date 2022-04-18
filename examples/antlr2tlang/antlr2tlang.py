@@ -22,9 +22,9 @@ def declare(context):
 
 @tlang.contextonly(["declared"])
 def create_lookup(context):
-    lookup = ""
-    for name in context["declared"]:
-        lookup += f'    "{name}": {name}.recur(skip),\n'
+    lookup = ",\n    ".join(
+        f'"{name}": {name}.recur(skip)' for name in context["declared"]
+    )
     yield context.set("lookup", lookup)
 
 
@@ -111,16 +111,21 @@ alteration = tlang.delimeted(concatenation, pipe.T(" / "), cache=True)
 alteration = alteration.recurrence("alteration")
 curly = tlang.Terminal("}")
 code = "{" + tlang.pgreedy(curly.inv()) + curly
+
+
 @tlang.contextonly(["hidden"])
 def skip_rules(context):
     if "hidden" in context:
         yield context.set("skip_rules", " / ".join(context["hidden"]))
     else:
         yield context.set("skip_rules", "tlang.nope")
+
+
 @tlang.contextonly(["name", "hidden"])
 def hide(context):
     context = tlang.set_scoped(context, ("hidden", context["name"]), None)
     yield context
+
 
 hidden = tlang.Terminal("channel(HIDDEN)") / "skip" + hide
 channel = ("channel(" + rule_name + ")") / "skip"
@@ -155,11 +160,20 @@ template = r"""import tlang
 skip_rules = {{skip_rules}}
 skip = tlang.typed({tlang.Terminal: lambda t: t / skip_rules})
 
+@tlang.contextfree
+def EOF(text):
+    if text == "":
+        yield "", text
+
 lookup = {
-{{lookup}}
+    {{lookup}},
+    "EOF": EOF
 }
 
-stiched = tlang.stitch(lookup)"""
+stitched = tlang.stitch(lookup)
+parse = stitched["parse"]
+assert list(parse.run("select * from schema.table;")) == ["select * from schema.table;"]
+"""
 
 transpiler = body.T(
     template,
