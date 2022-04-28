@@ -339,6 +339,13 @@ class Transpiler:
         """Only return one parse for each unique output string"""
         return Unique(self)
 
+    def replace(self, lookup):
+        """Replace transpilers according to lookup table
+    Args:
+        lookup (dict): map from transpilers to search for to their replacements"""
+        return self.recur(lambda t: lookup.get(t, t))
+
+
     def recurrence(self, identifier):
         """Create a copy and replace any ``Placeholder`` with identifier
         ``identifier`` with self reference. Return the modified copy"""
@@ -405,7 +412,8 @@ def update_links(transformations):
     for prev, new in transformations.items():
         if not isinstance(prev, Link):
             continue
-        new.set_parser(transformations[prev.parser])
+        parser = prev.parser
+        new.set_parser(transformations.get(parser, parser))
 
 
 def clear_visit_cache(t):
