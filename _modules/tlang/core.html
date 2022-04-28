@@ -414,6 +414,12 @@
         <span class="sd">&quot;&quot;&quot;Only return one parse for each unique output string&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">Unique</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
+<div class="viewcode-block" id="Transpiler.replace"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.replace">[docs]</a>    <span class="k">def</span> <span class="nf">replace</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">lookup</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replace transpilers according to lookup table</span>
+<span class="sd">        Args:</span>
+<span class="sd">            lookup (dict): map from transpilers to search for to their replacements&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span></div>
+
 <div class="viewcode-block" id="Transpiler.recurrence"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.recurrence">[docs]</a>    <span class="k">def</span> <span class="nf">recurrence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a copy and replace any ``Placeholder`` with identifier</span>
 <span class="sd">        ``identifier`` with self reference. Return the modified copy&quot;&quot;&quot;</span>
@@ -480,7 +486,8 @@
     <span class="k">for</span> <span class="n">prev</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">transformations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">Link</span><span class="p">):</span>
             <span class="k">continue</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">set_parser</span><span class="p">(</span><span class="n">transformations</span><span class="p">[</span><span class="n">prev</span><span class="o">.</span><span class="n">parser</span><span class="p">])</span></div>
+        <span class="n">parser</span> <span class="o">=</span> <span class="n">prev</span><span class="o">.</span><span class="n">parser</span>
+        <span class="n">new</span><span class="o">.</span><span class="n">set_parser</span><span class="p">(</span><span class="n">transformations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">parser</span><span class="p">))</span></div>
 
 
 <div class="viewcode-block" id="clear_visit_cache"><a class="viewcode-back" href="../../core.html#tlang.core.clear_visit_cache">[docs]</a><span class="k">def</span> <span class="nf">clear_visit_cache</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
