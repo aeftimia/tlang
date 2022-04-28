@@ -341,10 +341,9 @@ class Transpiler:
 
     def replace(self, lookup):
         """Replace transpilers according to lookup table
-    Args:
-        lookup (dict): map from transpilers to search for to their replacements"""
+        Args:
+            lookup (dict): map from transpilers to search for to their replacements"""
         return self.recur(lambda t: lookup.get(t, t))
-
 
     def recurrence(self, identifier):
         """Create a copy and replace any ``Placeholder`` with identifier

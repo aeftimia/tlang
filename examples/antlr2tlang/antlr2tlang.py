@@ -22,9 +22,7 @@ def declare(context):
 
 @tlang.contextonly(["declared"])
 def create_lookup(context):
-    lookup = ",\n    ".join(
-        f'"{name}": {name}' for name in context["declared"]
-    )
+    lookup = ",\n    ".join(f'"{name}": {name}' for name in context["declared"])
     yield context.set("lookup", lookup)
 
 
