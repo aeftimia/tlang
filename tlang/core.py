@@ -137,6 +137,10 @@ class Transpiler:
         self.init_context = root_context
 
     def __eq__(self, other):
+        if isinstance(other, Link):
+            other = other.parser
+        if isinstance(self, Link):
+            self = self.parser
         if type(self) is not type(other):
             return False
         return self.args == other.args and self.kwargs == other.kwargs
@@ -907,12 +911,6 @@ class Link(Wrapper):
     def set_parser(self, parser):
         self.parser = parser
         self.args[0] = parser
-
-    def __eq__(self, other):
-        return super().__eq__(other) or self.parser == other
-
-    def __hash__(self):
-        return id(self)
 
     @_lru_cache(None)
     def _recur(self, f, transformations):

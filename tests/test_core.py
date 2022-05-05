@@ -511,3 +511,11 @@ def test_double_recursion():
     assert list(s.run("baa")) == ["baa"]
     assert list(s.run("baa+b")) == ["baa+b"]
     assert list(s.run("(ba+b)a+b")) == ["(ba+b)a+b"]
+
+
+def test_equality():
+    r = tlang.Terminal("r") / tlang.null + tlang.Terminal("t")
+    s = tlang.Terminal("r") / tlang.null + tlang.Terminal("t")
+    assert r == s
+    s = tlang.Link(tlang.Terminal("r")) / tlang.null + tlang.Terminal("t")
+    assert r == s
