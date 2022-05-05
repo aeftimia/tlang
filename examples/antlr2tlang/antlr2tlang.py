@@ -168,10 +168,7 @@ lookup = {
 skip_rules = {{skip_rules}}
 skip = tlang.typed({tlang.Terminal: lambda t: t / skip_rules})
 
-globals().update({
-    key: value.recur(skip)
-    for key, value
-    in tlang.stitch(lookup).items()})
+globals().update(tlang.stitch(lookup))
 assert list(parse.run("select * from schema.table;")) == ["select * from schema.table;"]
 """
 
@@ -189,5 +186,5 @@ with open(os.path.join(here, "SQLite.g4"), "r") as f:
 
 out = list(transpiler.run(antlr))
 assert len(out) == 1
-with open(os.path.join(here, "tsql.py"), "w") as f:
+with open(os.path.join(here, "sqlite.py"), "w") as f:
     f.write(out[0])

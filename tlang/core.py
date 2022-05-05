@@ -353,7 +353,7 @@ class Transpiler:
     def recur(self, f):
         """Build a new transpiler from the result of recursively applying a
         function to all the transpilers that comprise this one."""
-        transformations = HashDict({})
+        transformations = HashDict()
         new = self._recur(f, transformations)
         update_links(transformations)
         reset(new)
@@ -387,7 +387,7 @@ def stitch(lookup):
     Returns:
         dict: map from placeholder identifiers to properly linked parsers"""
     link_lookup = {key: Link(value) for key, value in lookup.items()}
-    transformations = HashDict({})
+    transformations = HashDict()
     # similar sequence to recur
     lookup = {
         key: value._recur(
@@ -404,7 +404,31 @@ def stitch(lookup):
     # Now we can reinitialize
     for value in lookup.values():
         reset(value)
-    return lookup
+    # clean up unnecessary links
+    return {key: clean_links(value) for key, value in lookup.items()}
+
+
+def clean_links(t):
+    # remove links
+    seen = set()
+
+    @_lru_cache(None)
+    def eliminate_link(parser):
+        id_ = id(parser)
+        if id_ in seen:
+            return Link(parser)
+        seen.add(id_)
+        if isinstance(parser, Combinator):
+            children = tuple(map(eliminate_link, parser.args[0]))
+            parser.args = (children, *parser.args[1:])
+            return parser
+        if isinstance(parser, Wrapper):
+            child = eliminate_link(parser.args[0])
+            parser.args = (child, *parser.args[1:])
+            return parser
+        return parser
+
+    return eliminate_link(t)
 
 
 def update_links(transformations):
@@ -883,6 +907,12 @@ class Link(Wrapper):
     def set_parser(self, parser):
         self.parser = parser
         self.args[0] = parser
+
+    def __eq__(self, other):
+        return super().__eq__(other) or self.parser == other
+
+    def __hash__(self):
+        return id(self)
 
     @_lru_cache(None)
     def _recur(self, f, transformations):

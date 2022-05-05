@@ -106,6 +106,8 @@ body += rule_delimeter + rule_assignment_lines + rule_delimeter.T("")
 body += create_lookup
 transpiler = body.T(
     r"""import tlang
+import sys
+sys.setrecursionlimit(5000)
 
 whitespace = tlang.Terminal('\n') / ' ' / '\t' / '\r' / '\f'
 whitespaces = tlang.pgreedy(whitespace)

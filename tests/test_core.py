@@ -501,3 +501,13 @@ def test_custom():
     rule = rule.T("[{p}]")
     for test in ("a", "aa", "abc", "abbca", "ddadbc"):
         assert [str(list(test))] == list(rule.run(test))
+
+
+def test_double_recursion():
+    rule = tlang.Placeholder("r") + "a" | "(" + tlang.Placeholder("s") + ")" | "b"
+    rule = rule.recurrence("r")
+    s = rule + ~("+" + rule)
+    s = s.recurrence("s")
+    assert list(s.run("baa")) == ["baa"]
+    assert list(s.run("baa+b")) == ["baa+b"]
+    assert list(s.run("(ba+b)a+b")) == ["(ba+b)a+b"]
