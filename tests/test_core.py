@@ -519,3 +519,5 @@ def test_equality():
     assert r == s
     s = tlang.Link(tlang.Terminal("r")) / tlang.null + tlang.Terminal("t")
     assert r == s
+    s = tlang.Link(tlang.Terminal("r")) / tlang.null + tlang.Link(tlang.Terminal("t"))
+    assert r == s

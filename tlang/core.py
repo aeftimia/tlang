@@ -137,9 +137,9 @@ class Transpiler:
         self.init_context = root_context
 
     def __eq__(self, other):
-        if isinstance(other, Link):
+        while isinstance(other, Link):
             other = other.parser
-        if isinstance(self, Link):
+        while isinstance(self, Link):
             self = self.parser
         if type(self) is not type(other):
             return False
@@ -424,11 +424,11 @@ def clean_links(t):
         seen.add(id_)
         if isinstance(parser, Combinator):
             children = tuple(map(eliminate_link, parser.args[0]))
-            parser.args = (children, *parser.args[1:])
+            parser.args[0] = children
             return parser
         if isinstance(parser, Wrapper):
             child = eliminate_link(parser.args[0])
-            parser.args = (child, *parser.args[1:])
+            parser.args[0] = child
             return parser
         return parser
 
