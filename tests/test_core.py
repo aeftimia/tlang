@@ -527,3 +527,11 @@ def test_clean_links():
     r = tlang.Placeholder("r") + tlang.Link(tlang.Terminal("s"))
     r = r.recurrence("r")
     assert repr(r) == "Concatenation((Link(Concatenation), Terminal('s')))"
+
+
+def test_hash():
+    r = tlang.Terminal("test")
+    assert hash(tlang.Link(r)) == hash(r)
+    s = tlang.Terminal("2")
+    assert hash(tlang.Link(r) | s) == hash(r | s)
+    assert hash(tlang.Link(tlang.Terminal("test")) | s) == hash(r | s)

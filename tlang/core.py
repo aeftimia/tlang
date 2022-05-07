@@ -126,12 +126,16 @@ root_context = _Map()
 
 class Transpiler:
     def __init__(self, *args, **kwargs):
-        self.__hash = hash((type(self), args, frozenset(kwargs.items())))
         self.read_context = frozenset([""])
         self.kwargs = kwargs
         self.args = list(args)
         self.init_context = root_context
         self.cmp_gaurd = set()
+
+    def __hash__(self):
+        return hash(
+            (type(self), tuple(map(type, self.args)), frozenset(self.kwargs.items()))
+        )
 
     def __eq__(self, other):
         while isinstance(other, Link):
@@ -159,9 +163,6 @@ class Transpiler:
     def reset(self, write_context=frozenset([""])):
         write_context = frozenset(write_context)
         return Reset(self, write_context)
-
-    def __hash__(self):
-        return self.__hash
 
     def copy(self, *new_args, **new_kwargs):
         """Recreat this object using the args and kwargs that generated it.
@@ -927,6 +928,9 @@ class Link(Wrapper):
 
     def _recur(self, f):
         return f(self.parser)
+
+    def __hash__(self):
+        return hash(self.parser)
 
     def set_parser(self, parser):
         self.parser = parser
