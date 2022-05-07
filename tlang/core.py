@@ -126,6 +126,7 @@ root_context = _Map()
 
 class Transpiler:
     def __init__(self, *args, **kwargs):
+        self.__hash = hash((type(self), args, frozenset(kwargs.items())))
         self.read_context = frozenset([""])
         self.kwargs = kwargs
         self.args = list(args)
@@ -160,7 +161,7 @@ class Transpiler:
         return Reset(self, write_context)
 
     def __hash__(self):
-        return hash(repr(self))
+        return self.__hash
 
     def copy(self, *new_args, **new_kwargs):
         """Recreat this object using the args and kwargs that generated it.

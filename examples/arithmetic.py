@@ -83,4 +83,4 @@ if __name__ == "__main__":
         assert eval(exp.replace("100", "4").replace("10", "2")) == 4, exp
         print(exp)
     print("n", j)
-    assert n == 329
+    assert j == 329
