@@ -160,7 +160,7 @@ class Transpiler:
         return Reset(self, write_context)
 
     def __hash__(self):
-        return id(self)
+        return hash(repr(self))
 
     def copy(self, *new_args, **new_kwargs):
         """Recreat this object using the args and kwargs that generated it.
@@ -383,8 +383,8 @@ class Transpiler:
             if id_ in gaurd:
                 new = Link(t)
                 if id_ not in listeners:
-                    listeners[id_] = set()
-                listeners[id_].add(new)
+                    listeners[id_] = []
+                listeners[id_].append(new)
                 return new
             gaurd.add(id_)
             new = tracker[id_] = _recur(t)
@@ -409,7 +409,7 @@ class Transpiler:
 
 
 def stitch(lookup):
-    """Stitch transpilers by reference, replacing Placeholders with Links.
+    """Stitch transpilers by reference, replacing Placeholders.
 
     Args:
         lookup (dict): map from placeholder identifiers to parsers
