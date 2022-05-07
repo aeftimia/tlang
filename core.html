@@ -349,12 +349,6 @@ string, output context))</p>
 </dd></dl>
 
 <dl class="py class">
-<dt class="sig sig-object py" id="tlang.core.HashDict">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">HashDict</span></span><a class="reference internal" href="_modules/tlang/core.html#HashDict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.HashDict" title="Permalink to this definition"></a></dt>
-<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></p>
-</dd></dl>
-
-<dl class="py class">
 <dt class="sig sig-object py" id="tlang.core.Link">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Link</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Link"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Link" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tlang.core.Wrapper" title="tlang.core.Wrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Wrapper</span></code></a></p>
@@ -364,13 +358,6 @@ pointer in C or a link on a filesystem.</p>
 <dt class="sig sig-object py" id="tlang.core.Link.set_parser">
 <span class="sig-name descname"><span class="pre">set_parser</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parser</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Link.set_parser"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Link.set_parser" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py method">
-<dt class="sig sig-object py" id="tlang.core.Link.visit">
-<span class="sig-name descname"><span class="pre">visit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Link.visit"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Link.visit" title="Permalink to this definition"></a></dt>
-<dd><p>Like recur but don’t build anything new. Just apply the function to
-each transpiler that comprise this one</p>
-</dd></dl>
 
 </dd></dl>
 
@@ -776,7 +763,7 @@ string, output context))</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tlang.core.Transpiler.recur">
-<span class="sig-name descname"><span class="pre">recur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.recur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.recur" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">recur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaurd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listeners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.recur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.recur" title="Permalink to this definition"></a></dt>
 <dd><p>Build a new transpiler from the result of recursively applying a
 function to all the transpilers that comprise this one.</p>
 </dd></dl>
@@ -924,12 +911,8 @@ each transpiler that comprise this one</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="tlang.core.clean_links">
 <span class="sig-name descname"><span class="pre">clean_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#clean_links"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.clean_links" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tlang.core.clear_visit_cache">
-<span class="sig-name descname"><span class="pre">clear_visit_cache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#clear_visit_cache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.clear_visit_cache" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
+<dd><p>Ensure Links only used with self reference</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tlang.core.contextfree">
@@ -1098,7 +1081,7 @@ those transpilers’ read and write contexts change.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="tlang.core.stitch">
 <span class="sig-name descname"><span class="pre">stitch</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">lookup</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#stitch"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.stitch" title="Permalink to this definition"></a></dt>
-<dd><p>Stitch transpilers by reference, replacing Placeholders with Links.</p>
+<dd><p>Stitch transpilers by reference, replacing Placeholders.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>lookup</strong> (<em>dict</em>) – map from placeholder identifiers to parsers</p>
