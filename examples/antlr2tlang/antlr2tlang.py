@@ -152,6 +152,8 @@ body += maybe_comments + rule_assignments / tlang.null
 body += maybe_comments
 body += skip_rules + create_lookup
 template = r"""import tlang
+import sys
+sys.setrecursionlimit(5000)
 
 {{}}
 

@@ -3,7 +3,7 @@ import string as _string
 from itertools import starmap as _starmap
 from collections import deque as _deque
 from immutables import Map as _Map
-from functools import lru_cache as _lru_cache, singledispatch as _singledispatch
+from functools import singledispatch as _singledispatch
 
 
 class CachedParse:
@@ -26,11 +26,6 @@ class CachedParse:
             yield parse
         for output, modifications in self.cache[i:]:
             yield output, merge(context, modifications)
-
-
-class HashDict(dict):
-    def __hash__(self):
-        return id(self)
 
 
 def diff(new, initial):
@@ -135,15 +130,23 @@ class Transpiler:
         self.kwargs = kwargs
         self.args = list(args)
         self.init_context = root_context
+        self.cmp_gaurd = set()
 
     def __eq__(self, other):
         while isinstance(other, Link):
             other = other.parser
         while isinstance(self, Link):
             self = self.parser
+        id_ = id(other)
+        if id_ in self.cmp_gaurd:
+            return True
         if type(self) is not type(other):
             return False
-        return self.args == other.args and self.kwargs == other.kwargs
+        self.cmp_gaurd.add(id_)
+        ret = self.args == other.args and self.kwargs == other.kwargs
+        if not ret:
+            self.cmp_gaurd.remove(id_)
+        return ret
 
     @classmethod
     def new(cls, *args, **kwargs):
@@ -240,9 +243,7 @@ class Transpiler:
 
     def __repr__(self):
         args = ", ".join(map(repr, self.args))
-        kwargs = ", ".join(f"{key}={repr(value)}" for key, value in self.kwargs.items())
-        if kwargs:
-            args += ", " + kwargs
+        args += ", ".join(f"{key}={repr(value)}" for key, value in self.kwargs.items())
         return f"{self.__class__.__name__}({args})"
 
     def __call__(self, context):
@@ -354,32 +355,57 @@ class Transpiler:
         ``identifier`` with self reference. Return the modified copy"""
         return stitch({identifier: self})[identifier]
 
-    def recur(self, f):
+    def recur(self, f, inplace=False, gaurd=None, tracker=None, listeners=None):
         """Build a new transpiler from the result of recursively applying a
         function to all the transpilers that comprise this one."""
-        transformations = HashDict()
-        new = self._recur(f, transformations)
-        update_links(transformations)
-        reset(new)
+        if tracker is None:
+            tracker = {}
+        if inplace:
+
+            def _recur(t):
+                t.visit(cached_recur)
+                return f(t)
+
+        else:
+
+            def _recur(t):
+                return f(t._recur(cached_recur))
+
+        if gaurd is None:
+            gaurd = set()
+        if listeners is None:
+            listeners = {}
+
+        def cached_recur(t):
+            id_ = id(t)
+            if id_ in tracker:
+                return tracker[id_]
+            if id_ in gaurd:
+                new = Link(t)
+                if id_ not in listeners:
+                    listeners[id_] = set()
+                listeners[id_].add(new)
+                return new
+            gaurd.add(id_)
+            new = tracker[id_] = _recur(t)
+            if id_ in listeners:
+                for listener in listeners[id_]:
+                    listener.set_parser(tracker[id_])
+                del listeners[id_]
+            return new
+
+        new = cached_recur(self)
+        if not inplace:
+            reset(new)
         return new
 
-    @_lru_cache(None)
-    def _recur(self, f, transformations):
-        """Build a new transpiler from the result of recursively applying a
-        function to all the transpilers that comprise this one. Rather than
-        fixing broken references, just track which transpilers the resulting
-        transpilers were derived from in the dict argument. Subsequent passes
-        in ``recur`` use this map to fix broken links."""
+    def _recur(self, f):
+        return self.copy()
 
-        new = f(self.copy())
-        transformations[self] = new
-        return new
-
-    @_lru_cache(None)
     def visit(self, f):
         """Like recur but don't build anything new. Just apply the function to
         each transpiler that comprise this one"""
-        f(self)
+        self
 
 
 def stitch(lookup):
@@ -390,47 +416,54 @@ def stitch(lookup):
 
     Returns:
         dict: map from placeholder identifiers to properly linked parsers"""
-    link_lookup = {key: Link(value) for key, value in lookup.items()}
-    transformations = HashDict()
-    # similar sequence to recur
-    lookup = {
-        key: value._recur(
-            typed({Placeholder: lambda t: link_lookup.get(t.identifier, t)}),
-            transformations,
-        )
-        for key, value in lookup.items()
-    }
-    update_links(transformations)
-    # but link's parser needs to be reset
-    # because of self reference
-    for key, link in link_lookup.items():
-        link.set_parser(lookup[key])
-    # Now we can reinitialize
+    gaurd, tracker, listeners = set(), {}, {}
+
+    def _replace(t):
+        identifier = t.identifier
+        if identifier in lookup:
+            return recur(lookup[identifier])
+        return t
+
+    replace = typed({Placeholder: _replace})
+
+    def recur(t):
+        return t.recur(replace, gaurd=gaurd, tracker=tracker, listeners=listeners)
+
+    lookup = {key: recur(value) for key, value in lookup.items()}
+    for id_, listener in listeners.items():
+        listener.set_parser(tracker[id_])
     for value in lookup.values():
         reset(value)
-    # clean up unnecessary links
-    return {key: clean_links(value) for key, value in lookup.items()}
+    return lookup
 
 
 def clean_links(t):
-    # remove links
+    """Ensure Links only used with self reference"""
     seen = set()
+    cache = {}
 
-    @_lru_cache(None)
     def eliminate_link(parser):
         id_ = id(parser)
+        if id_ in cache:
+            return cache[id_]
         if id_ in seen:
-            return Link(parser)
-        seen.add(id_)
-        if isinstance(parser, Combinator):
-            children = tuple(map(eliminate_link, parser.args[0]))
-            parser.args[0] = children
-            return parser
-        if isinstance(parser, Wrapper):
-            child = eliminate_link(parser.args[0])
-            parser.args[0] = child
-            return parser
-        return parser
+            new = Link(parser)
+        else:
+            if isinstance(parser, Link):
+                parser = parser.parser
+                seen.add(id(parser))
+                new = eliminate_link(parser)
+            else:
+                seen.add(id_)
+                if isinstance(parser, Combinator):
+                    parser.left, parser.right = parser.args[0] = tuple(
+                        map(eliminate_link, parser.args[0])
+                    )
+                if isinstance(parser, Wrapper):
+                    parser.parser = parser.args[0] = eliminate_link(parser.args[0])
+                new = parser
+        cache[id_] = new
+        return new
 
     return eliminate_link(t)
 
@@ -441,10 +474,6 @@ def update_links(transformations):
             continue
         parser = prev.parser
         new.set_parser(transformations.get(parser, parser))
-
-
-def clear_visit_cache(t):
-    t.visit.cache_clear()
 
 
 def reset(t):
@@ -460,8 +489,7 @@ def reset(t):
 
     while inconsistent:
         inconsistent = False
-        t.visit(reinit)
-        t.visit(clear_visit_cache)
+        t.recur(reinit, inplace=True)
 
 
 def roundrobin(iterables):
@@ -639,16 +667,11 @@ class Wrapper(Transpiler):
     def process(self, key):
         return self.parser(key)
 
-    @_lru_cache(None)
-    def _recur(self, f, transformations):
-        new = f(self.copy(self.parser._recur(f, transformations)))
-        transformations[self] = new
-        return new
+    def _recur(self, f):
+        return self.copy(f(self.parser))
 
-    @_lru_cache(None)
     def visit(self, f):
         self.parser.visit(f)
-        f(self)
 
 
 class Reset(Wrapper):
@@ -752,24 +775,17 @@ class Combinator(Cached):
                 )
         self.read_context = self.left.read_context | self.right.read_context
 
-    @_lru_cache(None)
-    def _recur(self, f, transformations):
-        new = f(
-            self.copy(
-                (
-                    self.left._recur(f, transformations),
-                    self.right._recur(f, transformations),
-                )
+    def _recur(self, f):
+        return self.copy(
+            (
+                f(self.left),
+                f(self.right),
             )
         )
-        transformations[self] = new
-        return new
 
-    @_lru_cache(None)
     def visit(self, f):
-        self.left.visit(f)
-        self.right.visit(f)
-        f(self)
+        f(self.left)
+        f(self.right)
 
 
 class Alteration(Combinator):
@@ -908,19 +924,12 @@ class Link(Wrapper):
     """Reference transpiler in a possibly recursive fashion. Analagous to a
     pointer in C or a link on a filesystem."""
 
+    def _recur(self, f):
+        return f(self.parser)
+
     def set_parser(self, parser):
         self.parser = parser
         self.args[0] = parser
-
-    @_lru_cache(None)
-    def _recur(self, f, transformations):
-        new = f(self.copy())
-        transformations[self] = new
-        return new
-
-    @_lru_cache(None)
-    def visit(self, f):
-        f(self)
 
     def __repr__(self):
         return f"Link({self.parser.__class__.__name__})"

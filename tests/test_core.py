@@ -201,7 +201,6 @@ def test_repeat_recur2():
         return transpiler
 
     f = tlang.typed({tlang.Terminal: transform})
-    f.tag = "a"
     rule = rule0.recur(f)
     print("new", rule)
     for i in range(10):
@@ -210,7 +209,8 @@ def test_repeat_recur2():
 
 def test_repeat_recur_identity():
     rule = tlang.repetition(tlang.Terminal("ab"))
-    assert str(rule) == str(rule.recur(lambda x: x))
+    test = rule.recur(lambda x: x)
+    assert test == rule
 
 
 def test_named():
@@ -521,3 +521,9 @@ def test_equality():
     assert r == s
     s = tlang.Link(tlang.Terminal("r")) / tlang.null + tlang.Link(tlang.Terminal("t"))
     assert r == s
+
+
+def test_clean_links():
+    r = tlang.Placeholder("r") + tlang.Link(tlang.Terminal("s"))
+    r = r.recurrence("r")
+    assert repr(r) == "Concatenation((Link(Concatenation), Terminal('s')))"
