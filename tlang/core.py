@@ -12,11 +12,9 @@ class CachedParse:
         self.initial_context = initial_context
         self.cache = []
 
-    def run(self, context, cache_only=False):
+    def run(self, context):
         for output, modifications in self.cache:
             yield output, merge(context, modifications)
-        if cache_only:
-            return
         i = len(self.cache)
         for parse in self.generator:
             output, context = parse
@@ -245,7 +243,9 @@ class Transpiler:
 
     def __repr__(self):
         args = ", ".join(map(repr, self.args))
-        args += ", ".join(f"{key}={repr(value)}" for key, value in self.kwargs.items())
+        kwargs = ", ".join(f"{key}={repr(value)}" for key, value in self.kwargs.items())
+        if kwargs:
+            args += ", " + kwargs
         return f"{self.__class__.__name__}({args})"
 
     def __call__(self, context):

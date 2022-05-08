@@ -5,24 +5,31 @@ import tlang
 from immutables import Map
 
 
-@tlang.transpiler(["", "declared", "undeclared"])
+@tlang.transpiler(["", "declared"])
 def reference(context):
     tokens, context = context[""], context.set("", "")
     if tokens in context.get("declared", Map()):
         yield tokens, context
     else:
-        context = tlang.set_scoped(context, ("undeclared", tokens), None)
         yield f'tlang.Placeholder("{tokens}")', context
 
 
-@tlang.contextonly(["declared", "name"])
+@tlang.contextonly(["declared", "non-fragments", "name"])
 def declare(context):
-    yield tlang.set_scoped(context, ("declared", context["name"]), None)
+    tokens = context["name"]
+    if not context["fragment"]:
+        context = tlang.set_scoped(context, ("non-fragments", tokens), None)
+    yield tlang.set_scoped(context, ("declared", tokens), None)
 
 
 @tlang.contextonly(["declared"])
 def create_lookup(context):
-    lookup = ",\n    ".join(f'"{name}": {name}' for name in context["declared"])
+    lookup = ",\n    ".join(
+        f'"{name}": skip + {name}'
+        if name in context["non-fragments"]
+        else f'"{name}": {name}'
+        for name in context["declared"]
+    )
     yield context.set("lookup", lookup)
 
 
@@ -65,13 +72,7 @@ def fmt_char_range(chrs):
 alpha = tlang.letter / "_"
 rule_name = alpha + tlang.pgreedy(alpha / tlang.digit)
 referenced = rule_name * reference
-grouped = (
-    "("
-    + remove_whitespaces
-    + tlang.Placeholder("alteration")
-    + remove_whitespaces
-    + ")"
-)
+grouped = "(" + whitespaces + tlang.Placeholder("alteration") + whitespaces + ")"
 charrange = tlang.letter + "-" + tlang.letter
 digitrange = tlang.digit + "-" + tlang.digit
 bracket = tlang.Terminal("]")
@@ -94,7 +95,7 @@ term = quoted / grouped / referenced
 term /= tlang.Terminal(".").T("tlang.wild")
 term /= charset
 ph = tlang.Placeholder("term").ref("term")
-optional = (ph + tlang.Terminal("?")).T("({term} / tlang.null)")
+optional = (ph + tlang.Terminal("?")).T("{term} / tlang.null")
 star = (ph + tlang.Terminal("*")).T("tlang.pgreedy({term})")
 plus = (ph + tlang.Terminal("+")).T("({term} + tlang.pgreedy({term}))")
 suffixed = optional | star | plus
@@ -104,8 +105,10 @@ prefixed = ("~" + term).T("{term}.inv()")
 term = prefixed / term
 sep = +tlang.wild + maybe_comments.T(" + ")
 concatenation = tlang.delimeted(term, sep, cache=True)
+concatenation = (term + sep + concatenation).T("({})") / concatenation
 pipe = maybe_comments + tlang.Terminal("|") + maybe_comments
-alteration = tlang.delimeted(concatenation, pipe.T(" / "), cache=True)
+pipe = pipe.T(" / ")
+alteration = tlang.delimeted(concatenation, pipe, cache=True)
 alteration = alteration.recurrence("alteration")
 curly = tlang.Terminal("}")
 code = "{" + tlang.pgreedy(curly.inv()) + curly
@@ -131,8 +134,21 @@ channel *= hidden / tlang.identity
 action = "->" + maybe_comments + channel
 action /= code
 semi = tlang.Terminal(";").T("")
+
+
+def flag_fragment(flag):
+    @tlang.contextonly()
+    def set_fragment(context):
+        yield context.set("fragment", flag)
+
+    return set_fragment
+
+
 rule_assignment = (
-    (("fragment " + maybe_comments) / tlang.null)
+    (
+        ("fragment " + maybe_comments + flag_fragment(True))
+        / (tlang.null + flag_fragment(False))
+    )
     + rule_name.ref("name")
     + maybe_comments
     + tlang.Terminal(":")
@@ -162,16 +178,18 @@ def EOF(text):
     if text == "":
         yield "", text
 
+skip = tlang.pgreedy({{skip_rules}})
+
 lookup = {
     {{lookup}},
     "EOF": EOF
 }
-
-skip_rules = {{skip_rules}}
-skip = tlang.typed({tlang.Terminal: lambda t: t / skip_rules})
+lookup["UNEXPECTED_CHAR"] = tlang.nope
 
 globals().update(tlang.stitch(lookup))
-assert list(parse.run("select * from schema.table;")) == ["select * from schema.table;"]
+assert list(parse.run("select * from schema.table;")) == [
+    "select * from schema.table;"
+]
 """
 
 transpiler = body.T(
