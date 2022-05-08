@@ -77,6 +77,32 @@
   <section id="module-tlang.core">
 <span id="core"></span><h1>core<a class="headerlink" href="#module-tlang.core" title="Permalink to this headline"></a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="tlang.core.ALLSTARAlteration">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">ALLSTARAlteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">parsers</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#ALLSTARAlteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.ALLSTARAlteration" title="Permalink to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#tlang.core.PEGAlteration" title="tlang.core.PEGAlteration"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.PEGAlteration</span></code></a></p>
+<p>PEGAlteration that handles left recursion via rewrites.
+<a class="reference external" href="https://www.antlr.org/papers/allstar-techreport.pdf">https://www.antlr.org/papers/allstar-techreport.pdf</a></p>
+<dl class="py method">
+<dt class="sig sig-object py" id="tlang.core.ALLSTARAlteration.process">
+<span class="sig-name descname"><span class="pre">process</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#ALLSTARAlteration.process"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.ALLSTARAlteration.process" title="Permalink to this definition"></a></dt>
+<dd><p>Transpile input without caching</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> – tuple with input string as first argument and input context as</p></li>
+<li><p><strong>arugment.</strong> (<em>second</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Generator of tuples of the form (output string, (remaining input
+string, output context))</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="tlang.core.Alteration">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Alteration</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Alteration"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Alteration" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tlang.core.Combinator" title="tlang.core.Combinator"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Combinator</span></code></a></p>
@@ -158,7 +184,7 @@ for masks.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tlang.core.CachedParse.run">
-<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cache_only</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#CachedParse.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.CachedParse.run" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">run</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#CachedParse.run"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.CachedParse.run" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
