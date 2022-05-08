@@ -4,6 +4,7 @@ from itertools import starmap as _starmap
 from collections import deque as _deque
 from immutables import Map as _Map
 from functools import singledispatch as _singledispatch
+from typing import Dict
 
 
 class CachedParse:
@@ -363,33 +364,45 @@ class Transpiler:
         """Replace transpilers according to lookup table
         Args:
             lookup (dict): map from transpilers to search for to their replacements"""
-        return self.recur(lambda t: lookup.get(t, t))
+        lookup = {key: (key, value) for key, value in lookup.items()}
+
+        def sub(t):
+            if t in lookup:
+                key, value = lookup[t]
+                if t == key:
+                    return value
+            return t
+
+        return self.recur(sub)
 
     def recurrence(self, identifier):
         """Create a copy and replace any ``Placeholder`` with identifier
         ``identifier`` with self reference. Return the modified copy"""
         return stitch({identifier: self})[identifier]
 
-    def recur(self, f, inplace=False, gaurd=None, tracker=None, listeners=None):
+    def recur(self, f, inplace=False, meta=None):
         """Build a new transpiler from the result of recursively applying a
         function to all the transpilers that comprise this one."""
-        if tracker is None:
+        if meta is None:
             tracker = {}
+            listeners = {}
+            gaurd = set()
+        else:
+            gaurd, tracker, listeners = meta
+
         if inplace:
 
             def _recur(t):
                 t.visit(cached_recur)
-                return f(t)
+                f(t)
 
         else:
 
             def _recur(t):
-                return f(t._recur(cached_recur))
-
-        if gaurd is None:
-            gaurd = set()
-        if listeners is None:
-            listeners = {}
+                new = t._recur(cached_recur)
+                if isinstance(new, Link):
+                    return new
+                return f(new)
 
         def cached_recur(t):
             id_ = id(t)
@@ -431,64 +444,36 @@ def stitch(lookup):
 
     Returns:
         dict: map from placeholder identifiers to properly linked parsers"""
-    gaurd, tracker, listeners = set(), {}, {}
+    # Make all relevant placeholders with the same identifier identical
+    meta = gaurd, tracker, listeners = set(), {}, {}
+
+    cache = {}
 
     def _replace(t):
         identifier = t.identifier
         if identifier in lookup:
-            return recur(lookup[identifier])
+            if identifier not in cache:
+                cache[identifier] = recur(lookup[identifier])
+            return cache[identifier]
         return t
 
     replace = typed({Placeholder: _replace})
 
     def recur(t):
-        return t.recur(replace, gaurd=gaurd, tracker=tracker, listeners=listeners)
+        return t.recur(replace, meta=meta)
 
-    lookup = {key: recur(value) for key, value in lookup.items()}
+    for key, value in lookup.items():
+        new = recur(value)
+        if key not in cache:
+            cache[key] = new
     for id_, listener in listeners.items():
         listener.set_parser(tracker[id_])
-    for value in lookup.values():
+    for value in cache.values():
         reset(value)
-    return lookup
-
-
-def clean_links(t):
-    """Ensure Links only used with self reference"""
-    seen = set()
-    cache = {}
-
-    def eliminate_link(parser):
-        id_ = id(parser)
-        if id_ in cache:
-            return cache[id_]
-        if id_ in seen:
-            new = Link(parser)
-        else:
-            if isinstance(parser, Link):
-                parser = parser.parser
-                seen.add(id(parser))
-                new = eliminate_link(parser)
-            else:
-                seen.add(id_)
-                if isinstance(parser, Combinator):
-                    parser.left, parser.right = parser.args[0] = tuple(
-                        map(eliminate_link, parser.args[0])
-                    )
-                if isinstance(parser, Wrapper):
-                    parser.parser = parser.args[0] = eliminate_link(parser.args[0])
-                new = parser
-        cache[id_] = new
-        return new
-
-    return eliminate_link(t)
-
-
-def update_links(transformations):
-    for prev, new in transformations.items():
-        if not isinstance(prev, Link):
-            continue
-        parser = prev.parser
-        new.set_parser(transformations.get(parser, parser))
+    for key, value in cache.items():
+        if isinstance(value, Link):
+            cache[key] = value.parser
+    return cache
 
 
 def reset(t):
@@ -631,20 +616,6 @@ class Terminal(Transpiler):
         test = tokens[: self.n]
         if test == self.text:
             yield test, context.set("", tokens[self.n :])  # noqa: E203
-
-    def __add__(self, other):
-        if isinstance(other, str):
-            other = Terminal(other)
-        if isinstance(other, Terminal):
-            return Terminal(self.text + other.text)
-        return super().__add__(other)
-
-    def __radd__(self, other):
-        if isinstance(other, str):
-            other = Terminal(other)
-        if isinstance(other, Terminal):
-            return Terminal(other.text + self.text)
-        return super().__radd__(other)
 
 
 @transpiler()
@@ -945,6 +916,13 @@ def decache(transpiler):
 class Placeholder(Transpiler):
     """Placeholder for transpiler that may not exist yet. Can be used to
     generate recursive transpilers with ``recurrence``."""
+
+    cache: Dict[str, Transpiler] = {}
+
+    def __new__(cls, identifier, *args, **kwargs):
+        if identifier in cls.cache:
+            return cls.cache[identifier]
+        return super().__new__(cls)
 
     def __init__(self, identifier, *args, **kwargs):
         super().__init__(identifier, *args, **kwargs)

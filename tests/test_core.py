@@ -92,12 +92,6 @@ def test_comp():
     assert [] == list(rule.run("b"))
 
 
-def test_terminal_cat():
-    aa = tlang.Terminal("a") + tlang.Terminal("a")
-    assert type(aa) is tlang.Terminal
-    assert aa.text == "aa"
-
-
 def test_gen():
     rule = tlang.Terminal("a")[:]
     print(rule)
@@ -440,6 +434,22 @@ def test_placeholder():
 def test_double_placeholder():
     rule = "b" + tlang.Placeholder("B") | "a" + tlang.Placeholder("B") | "c"
     rule = rule.recurrence("B")
+    counter1 = 0
+    counter2 = 0
+
+    def count(t):
+        nonlocal counter1, counter2
+        t = t.parser
+        if t is rule:
+            counter1 += 1
+        if t == rule:
+            counter2 += 1
+
+    rule.recur(tlang.typed({tlang.Link: count}), inplace=True)
+    print(rule)
+    print(counter1, counter2)
+    assert counter1 == counter2
+    assert counter1 == 1
     for test in ("c", "ac", "bc", "abc", "aac", "bbc", "bac"):
         assert [test] == list(rule.run(test))
 
@@ -459,6 +469,14 @@ def test_stitch():
         test += "a"
         assert [test] == list(rule.run(test))
         test += "b"
+        assert [test] == list(rule.run(test))
+
+    rule = tlang.stitch(lookup)["B"]
+    test = ""
+    for i in range(10):
+        test += "b"
+        assert [test] == list(rule.run(test))
+        test += "a"
         assert [test] == list(rule.run(test))
 
 
@@ -555,3 +573,44 @@ def test_allstar():
     )
     exp = exp.recurrence("exp")
     assert list(exp.run(x)) == [x]
+
+
+def test_mixed_ids():
+    t = tlang.Terminal("a") + ~tlang.Placeholder("B")
+    lookup = {
+        "A": t,
+        "B": tlang.Terminal("b") + ~tlang.Placeholder("A") | t,
+    }
+    rule = tlang.stitch(lookup)["A"]
+    counter1 = 0
+    counter2 = 0
+
+    def count(t):
+        nonlocal counter1, counter2
+        t = t.parser
+        if t is rule:
+            counter1 += 1
+        if t == rule:
+            counter2 += 1
+
+    rule.recur(tlang.typed({tlang.Link: count}), inplace=True)
+    print(rule)
+    assert counter1 == counter2 == 2
+
+
+def test_replace():
+    a = tlang.Terminal("a")
+    bc = tlang.Terminal("b") + tlang.Terminal("c")
+    rule = a + bc
+    bc2 = bc.T("")
+    new_rule = rule.replace({bc: bc2})
+    test = a + bc2
+    assert new_rule == test
+
+
+def test_replace_recursive():
+    rule = tlang.Terminal("a") + tlang.Placeholder("rule")
+    rule = rule.recurrence("rule")
+    print(rule)
+    c = tlang.Terminal("c")
+    assert rule.replace({rule: c}) is c

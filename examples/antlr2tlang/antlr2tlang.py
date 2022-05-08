@@ -5,12 +5,15 @@ import tlang
 from immutables import Map
 
 
-@tlang.transpiler(["", "declared"])
+@tlang.transpiler(["", "declared", "undeclared"])
 def reference(context):
     tokens, context = context[""], context.set("", "")
-    if tokens in context.get("declared", Map()):
+    if tokens in context.get("undeclared", Map()):
+        yield f'tlang.Placeholder("{tokens}")', context
+    elif tokens in context.get("declared", Map()):
         yield tokens, context
     else:
+        context = tlang.set_scoped(context, ("undeclared", tokens), None)
         yield f'tlang.Placeholder("{tokens}")', context
 
 
