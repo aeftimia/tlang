@@ -129,6 +129,7 @@ class Transpiler:
         self.args = list(args)
         self.init_context = root_context
         self.cmp_gaurd = set()
+        self.cmp_cache = {}
 
     def __hash__(self):
         return hash(
@@ -138,17 +139,17 @@ class Transpiler:
     def __eq__(self, other):
         while isinstance(other, Link):
             other = other.parser
-        while isinstance(self, Link):
-            self = self.parser
-        id_ = id(other)
-        if id_ in self.cmp_gaurd:
-            return True
         if type(self) is not type(other):
             return False
+        id_ = id(other)
+        if id_ in self.cmp_cache:
+            return self.cmp_cache[id_]
+        if id_ in self.cmp_gaurd:
+            return True
         self.cmp_gaurd.add(id_)
         ret = self.args == other.args and self.kwargs == other.kwargs
-        if not ret:
-            self.cmp_gaurd.remove(id_)
+        self.cmp_gaurd.remove(id_)
+        self.cmp_cache[id_] = ret
         return ret
 
     @classmethod
@@ -951,6 +952,9 @@ class Link(Wrapper):
 
     def _recur(self, f):
         return f(self.parser)
+
+    def __eq__(self, other):
+        return self.parser == other
 
     def __hash__(self):
         return hash(self.parser)
