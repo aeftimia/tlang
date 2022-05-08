@@ -536,3 +536,22 @@ def test_hash():
     s = tlang.Terminal("2")
     assert hash(tlang.Link(r) | s) == hash(r | s)
     assert hash(tlang.Link(tlang.Terminal("test")) | s) == hash(r | s)
+
+
+def test_allstar():
+    term = tlang.oneof("01")
+    exp = (
+        (tlang.Placeholder("exp") + "+" + tlang.Placeholder("exp"))
+        | (tlang.Placeholder("exp") + "*" + tlang.Placeholder("exp"))
+        | term
+    )
+    exp = exp.recurrence("exp")
+    x = "1+1*0+1*0"
+    assert list(exp.run(x)) == [x] * 2
+    exp = (
+        (tlang.Placeholder("exp") + "+" + tlang.Placeholder("exp"))
+        // (tlang.Placeholder("exp") + "*" + tlang.Placeholder("exp"))
+        // term
+    )
+    exp = exp.recurrence("exp")
+    assert list(exp.run(x)) == [x]

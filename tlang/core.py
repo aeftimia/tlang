@@ -859,15 +859,20 @@ class PEGAlteration(Combinator):
         yield from self.right(context)
 
 
-class ALLSTARAlteration(PEGAlteration):
+class ALLSTARAlteration(PEGAlteration, Alteration):
     """PEGAlteration that handles left recursion via rewrites.
     https://www.antlr.org/papers/allstar-techreport.pdf"""
 
-    def process(self, context):
+    def switch(self, context):
+        found = False
         try:
-            yield from super().process(context)
+            for parse in self.right(context):
+                yield parse
+                found = True
+            if not found:
+                yield from self.left(context)
         except ValueError:
-            return
+            pass
 
 
 def typed(m, default=lambda x: x):
