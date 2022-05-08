@@ -107,7 +107,7 @@ sep = +tlang.wild + maybe_comments.T(" + ")
 concatenation = tlang.delimeted(term, sep, cache=True)
 concatenation = (term + sep + concatenation).T("({})") / concatenation
 pipe = maybe_comments + tlang.Terminal("|") + maybe_comments
-pipe = pipe.T(" / ")
+pipe = pipe.T(" // ")
 alteration = tlang.delimeted(concatenation, pipe, cache=True)
 alteration = alteration.recurrence("alteration")
 curly = tlang.Terminal("}")

@@ -319,6 +319,18 @@ class Transpiler:
             other = Terminal(other)
         return PEGAlteration.new((other, self))
 
+    def __floordiv__(self, other):
+        """ALL(*) Alteration"""
+        if isinstance(other, str):
+            other = Terminal(other)
+        return ALLSTARAlteration.new((self, other))
+
+    def __rfloordiv__(self, other):
+        """ALL(*) Alteration"""
+        if isinstance(other, str):
+            other = Terminal(other)
+        return ALLSTARAlteration.new((other, self))
+
     def __getitem__(self, slice_key):
         """Repetition"""
         if slice_key.start is None:
@@ -844,6 +856,17 @@ class PEGAlteration(Combinator):
         if found:
             return
         yield from self.right(context)
+
+
+class ALLSTARAlteration(PEGAlteration):
+    """PEGAlteration that handles left recursion via rewrites.
+    https://www.antlr.org/papers/allstar-techreport.pdf"""
+
+    def process(self, context):
+        try:
+            yield from super().process(context)
+        except ValueError:
+            return
 
 
 def typed(m, default=lambda x: x):
