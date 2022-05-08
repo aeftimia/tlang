@@ -38,6 +38,7 @@ def test_run():
 
 def test_concatenation():
     assert ["ab"] == list((tlang.Terminal("a") + "b").run("ab"))
+    assert [] == list((tlang.Terminal("a") + "b")(tlang.root_context.set("", "ac")))
 
 
 def test_alteration():
