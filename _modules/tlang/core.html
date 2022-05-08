@@ -934,15 +934,20 @@
         <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">(</span><span class="n">context</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="ALLSTARAlteration"><a class="viewcode-back" href="../../core.html#tlang.core.ALLSTARAlteration">[docs]</a><span class="k">class</span> <span class="nc">ALLSTARAlteration</span><span class="p">(</span><span class="n">PEGAlteration</span><span class="p">):</span>
+<div class="viewcode-block" id="ALLSTARAlteration"><a class="viewcode-back" href="../../core.html#tlang.core.ALLSTARAlteration">[docs]</a><span class="k">class</span> <span class="nc">ALLSTARAlteration</span><span class="p">(</span><span class="n">PEGAlteration</span><span class="p">,</span> <span class="n">Alteration</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;PEGAlteration that handles left recursion via rewrites.</span>
 <span class="sd">    https://www.antlr.org/papers/allstar-techreport.pdf&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="ALLSTARAlteration.process"><a class="viewcode-back" href="../../core.html#tlang.core.ALLSTARAlteration.process">[docs]</a>    <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+<div class="viewcode-block" id="ALLSTARAlteration.switch"><a class="viewcode-back" href="../../core.html#tlang.core.ALLSTARAlteration.switch">[docs]</a>    <span class="k">def</span> <span class="nf">switch</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">context</span><span class="p">):</span>
+        <span class="n">found</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">yield from</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">parse</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">right</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+                <span class="k">yield</span> <span class="n">parse</span>
+                <span class="n">found</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">found</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">left</span><span class="p">(</span><span class="n">context</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">return</span></div></div>
+            <span class="k">pass</span></div></div>
 
 
 <div class="viewcode-block" id="typed"><a class="viewcode-back" href="../../core.html#tlang.core.typed">[docs]</a><span class="k">def</span> <span class="nf">typed</span><span class="p">(</span><span class="n">m</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">):</span>
