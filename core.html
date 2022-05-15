@@ -469,6 +469,11 @@ generate recursive transpilers with <code class="docutils literal notranslate"><
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">identifier</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Placeholder.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Placeholder.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
 
+<dl class="py attribute">
+<dt class="sig sig-object py" id="tlang.core.Placeholder.cache">
+<span class="sig-name descname"><span class="pre">cache</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><span class="pre">tlang.core.Transpiler</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#tlang.core.Placeholder.cache" title="Permalink to this definition"></a></dt>
+<dd></dd></dl>
+
 </dd></dl>
 
 <dl class="py class">
@@ -621,12 +626,6 @@ string, output context))</p>
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Terminal</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal" title="Permalink to this definition"></a></dt>
 <dd><p>Bases: <a class="reference internal" href="#tlang.core.Transpiler" title="tlang.core.Transpiler"><code class="xref py py-class docutils literal notranslate"><span class="pre">tlang.core.Transpiler</span></code></a></p>
 <dl class="py method">
-<dt class="sig sig-object py" id="tlang.core.Terminal.__add__">
-<span class="sig-name descname"><span class="pre">__add__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">other</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal.__add__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal.__add__" title="Permalink to this definition"></a></dt>
-<dd><p>Concatenation</p>
-</dd></dl>
-
-<dl class="py method">
 <dt class="sig sig-object py" id="tlang.core.Terminal.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Terminal.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Terminal.__init__" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
@@ -776,7 +775,7 @@ string, output context))</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="tlang.core.Transpiler.recur">
-<span class="sig-name descname"><span class="pre">recur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gaurd</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tracker</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">listeners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.recur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.recur" title="Permalink to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">recur</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">f</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">inplace</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#Transpiler.recur"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.Transpiler.recur" title="Permalink to this definition"></a></dt>
 <dd><p>Build a new transpiler from the result of recursively applying a
 function to all the transpilers that comprise this one.</p>
 </dd></dl>
@@ -920,12 +919,6 @@ each transpiler that comprise this one</p>
 <dt class="sig sig-object py" id="tlang.core.both_within">
 <span class="sig-name descname"><span class="pre">both_within</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">needle1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">needle2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">haystack</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sep</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">template2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commutative</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#both_within"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.both_within" title="Permalink to this definition"></a></dt>
 <dd></dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tlang.core.clean_links">
-<span class="sig-name descname"><span class="pre">clean_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">t</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#clean_links"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.clean_links" title="Permalink to this definition"></a></dt>
-<dd><p>Ensure Links only used with self reference</p>
-</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tlang.core.contextfree">
@@ -1159,11 +1152,6 @@ instance of any keys of <code class="docutils literal notranslate"><span class="
 </dd>
 </dl>
 </dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="tlang.core.update_links">
-<span class="sig-name descname"><span class="pre">update_links</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">transformations</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tlang/core.html#update_links"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tlang.core.update_links" title="Permalink to this definition"></a></dt>
-<dd></dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="tlang.core.within">

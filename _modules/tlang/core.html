@@ -79,6 +79,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span> <span class="k">as</span> <span class="n">_deque</span>
 <span class="kn">from</span> <span class="nn">immutables</span> <span class="kn">import</span> <span class="n">Map</span> <span class="k">as</span> <span class="n">_Map</span>
 <span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">singledispatch</span> <span class="k">as</span> <span class="n">_singledispatch</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span>
 
 
 <div class="viewcode-block" id="CachedParse"><a class="viewcode-back" href="../../core.html#tlang.core.CachedParse">[docs]</a><span class="k">class</span> <span class="nc">CachedParse</span><span class="p">:</span>
@@ -438,33 +439,45 @@
         <span class="sd">&quot;&quot;&quot;Replace transpilers according to lookup table</span>
 <span class="sd">        Args:</span>
 <span class="sd">            lookup (dict): map from transpilers to search for to their replacements&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="k">lambda</span> <span class="n">t</span><span class="p">:</span> <span class="n">lookup</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">t</span><span class="p">))</span></div>
+        <span class="n">lookup</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="k">def</span> <span class="nf">sub</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">lookup</span><span class="p">:</span>
+                <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="n">lookup</span><span class="p">[</span><span class="n">t</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">t</span> <span class="o">==</span> <span class="n">key</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">value</span>
+            <span class="k">return</span> <span class="n">t</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="n">sub</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Transpiler.recurrence"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.recurrence">[docs]</a>    <span class="k">def</span> <span class="nf">recurrence</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Create a copy and replace any ``Placeholder`` with identifier</span>
 <span class="sd">        ``identifier`` with self reference. Return the modified copy&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">stitch</span><span class="p">({</span><span class="n">identifier</span><span class="p">:</span> <span class="bp">self</span><span class="p">})[</span><span class="n">identifier</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Transpiler.recur"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.recur">[docs]</a>    <span class="k">def</span> <span class="nf">recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">gaurd</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">tracker</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">listeners</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="Transpiler.recur"><a class="viewcode-back" href="../../core.html#tlang.core.Transpiler.recur">[docs]</a>    <span class="k">def</span> <span class="nf">recur</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">inplace</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Build a new transpiler from the result of recursively applying a</span>
 <span class="sd">        function to all the transpilers that comprise this one.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">tracker</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">tracker</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">listeners</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="n">gaurd</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">gaurd</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">listeners</span> <span class="o">=</span> <span class="n">meta</span>
+
         <span class="k">if</span> <span class="n">inplace</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">_recur</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
                 <span class="n">t</span><span class="o">.</span><span class="n">visit</span><span class="p">(</span><span class="n">cached_recur</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
+                <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
 
             <span class="k">def</span> <span class="nf">_recur</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span><span class="n">cached_recur</span><span class="p">))</span>
-
-        <span class="k">if</span> <span class="n">gaurd</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">gaurd</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">listeners</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">listeners</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="n">new</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">_recur</span><span class="p">(</span><span class="n">cached_recur</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">Link</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">new</span>
+                <span class="k">return</span> <span class="n">f</span><span class="p">(</span><span class="n">new</span><span class="p">)</span>
 
         <span class="k">def</span> <span class="nf">cached_recur</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
             <span class="n">id_</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">t</span><span class="p">)</span>
@@ -506,64 +519,36 @@
 
 <span class="sd">    Returns:</span>
 <span class="sd">        dict: map from placeholder identifiers to properly linked parsers&quot;&quot;&quot;</span>
-    <span class="n">gaurd</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">listeners</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="p">{},</span> <span class="p">{}</span>
+    <span class="c1"># Make all relevant placeholders with the same identifier identical</span>
+    <span class="n">meta</span> <span class="o">=</span> <span class="n">gaurd</span><span class="p">,</span> <span class="n">tracker</span><span class="p">,</span> <span class="n">listeners</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(),</span> <span class="p">{},</span> <span class="p">{}</span>
+
+    <span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
 
     <span class="k">def</span> <span class="nf">_replace</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
         <span class="n">identifier</span> <span class="o">=</span> <span class="n">t</span><span class="o">.</span><span class="n">identifier</span>
         <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="n">lookup</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">recur</span><span class="p">(</span><span class="n">lookup</span><span class="p">[</span><span class="n">identifier</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">identifier</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+                <span class="n">cache</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span> <span class="o">=</span> <span class="n">recur</span><span class="p">(</span><span class="n">lookup</span><span class="p">[</span><span class="n">identifier</span><span class="p">])</span>
+            <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">t</span>
 
     <span class="n">replace</span> <span class="o">=</span> <span class="n">typed</span><span class="p">({</span><span class="n">Placeholder</span><span class="p">:</span> <span class="n">_replace</span><span class="p">})</span>
 
     <span class="k">def</span> <span class="nf">recur</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="n">replace</span><span class="p">,</span> <span class="n">gaurd</span><span class="o">=</span><span class="n">gaurd</span><span class="p">,</span> <span class="n">tracker</span><span class="o">=</span><span class="n">tracker</span><span class="p">,</span> <span class="n">listeners</span><span class="o">=</span><span class="n">listeners</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">t</span><span class="o">.</span><span class="n">recur</span><span class="p">(</span><span class="n">replace</span><span class="p">,</span> <span class="n">meta</span><span class="o">=</span><span class="n">meta</span><span class="p">)</span>
 
-    <span class="n">lookup</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">recur</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">new</span> <span class="o">=</span> <span class="n">recur</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
+            <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
     <span class="k">for</span> <span class="n">id_</span><span class="p">,</span> <span class="n">listener</span> <span class="ow">in</span> <span class="n">listeners</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">listener</span><span class="o">.</span><span class="n">set_parser</span><span class="p">(</span><span class="n">tracker</span><span class="p">[</span><span class="n">id_</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">lookup</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+    <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">cache</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
         <span class="n">reset</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lookup</span></div>
-
-
-<div class="viewcode-block" id="clean_links"><a class="viewcode-back" href="../../core.html#tlang.core.clean_links">[docs]</a><span class="k">def</span> <span class="nf">clean_links</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Ensure Links only used with self reference&quot;&quot;&quot;</span>
-    <span class="n">seen</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
-    <span class="n">cache</span> <span class="o">=</span> <span class="p">{}</span>
-
-    <span class="k">def</span> <span class="nf">eliminate_link</span><span class="p">(</span><span class="n">parser</span><span class="p">):</span>
-        <span class="n">id_</span> <span class="o">=</span> <span class="nb">id</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">cache</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">cache</span><span class="p">[</span><span class="n">id_</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">id_</span> <span class="ow">in</span> <span class="n">seen</span><span class="p">:</span>
-            <span class="n">new</span> <span class="o">=</span> <span class="n">Link</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">Link</span><span class="p">):</span>
-                <span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parser</span>
-                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">id</span><span class="p">(</span><span class="n">parser</span><span class="p">))</span>
-                <span class="n">new</span> <span class="o">=</span> <span class="n">eliminate_link</span><span class="p">(</span><span class="n">parser</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">seen</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">id_</span><span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">Combinator</span><span class="p">):</span>
-                    <span class="n">parser</span><span class="o">.</span><span class="n">left</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">right</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span>
-                        <span class="nb">map</span><span class="p">(</span><span class="n">eliminate_link</span><span class="p">,</span> <span class="n">parser</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                    <span class="p">)</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">Wrapper</span><span class="p">):</span>
-                    <span class="n">parser</span><span class="o">.</span><span class="n">parser</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">eliminate_link</span><span class="p">(</span><span class="n">parser</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">new</span> <span class="o">=</span> <span class="n">parser</span>
-        <span class="n">cache</span><span class="p">[</span><span class="n">id_</span><span class="p">]</span> <span class="o">=</span> <span class="n">new</span>
-        <span class="k">return</span> <span class="n">new</span>
-
-    <span class="k">return</span> <span class="n">eliminate_link</span><span class="p">(</span><span class="n">t</span><span class="p">)</span></div>
-
-
-<div class="viewcode-block" id="update_links"><a class="viewcode-back" href="../../core.html#tlang.core.update_links">[docs]</a><span class="k">def</span> <span class="nf">update_links</span><span class="p">(</span><span class="n">transformations</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">prev</span><span class="p">,</span> <span class="n">new</span> <span class="ow">in</span> <span class="n">transformations</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">prev</span><span class="p">,</span> <span class="n">Link</span><span class="p">):</span>
-            <span class="k">continue</span>
-        <span class="n">parser</span> <span class="o">=</span> <span class="n">prev</span><span class="o">.</span><span class="n">parser</span>
-        <span class="n">new</span><span class="o">.</span><span class="n">set_parser</span><span class="p">(</span><span class="n">transformations</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">parser</span><span class="p">,</span> <span class="n">parser</span><span class="p">))</span></div>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">cache</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Link</span><span class="p">):</span>
+            <span class="n">cache</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">parser</span>
+    <span class="k">return</span> <span class="n">cache</span></div>
 
 
 <div class="viewcode-block" id="reset"><a class="viewcode-back" href="../../core.html#tlang.core.reset">[docs]</a><span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
@@ -705,21 +690,7 @@
             <span class="k">return</span>
         <span class="n">test</span> <span class="o">=</span> <span class="n">tokens</span><span class="p">[:</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">test</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">test</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="p">:])</span>  <span class="c1"># noqa: E203</span></div>
-
-<div class="viewcode-block" id="Terminal.__add__"><a class="viewcode-back" href="../../core.html#tlang.core.Terminal.__add__">[docs]</a>    <span class="k">def</span> <span class="fm">__add__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Terminal</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Terminal</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="n">other</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__add__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
-
-    <span class="k">def</span> <span class="fm">__radd__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">other</span> <span class="o">=</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Terminal</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Terminal</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">text</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__radd__</span><span class="p">(</span><span class="n">other</span><span class="p">)</span></div>
+            <span class="k">yield</span> <span class="n">test</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">tokens</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="p">:])</span>  <span class="c1"># noqa: E203</span></div></div>
 
 
 <span class="nd">@transpiler</span><span class="p">()</span>
@@ -1020,6 +991,13 @@
 <div class="viewcode-block" id="Placeholder"><a class="viewcode-back" href="../../core.html#tlang.core.Placeholder">[docs]</a><span class="k">class</span> <span class="nc">Placeholder</span><span class="p">(</span><span class="n">Transpiler</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Placeholder for transpiler that may not exist yet. Can be used to</span>
 <span class="sd">    generate recursive transpilers with ``recurrence``.&quot;&quot;&quot;</span>
+
+    <span class="n">cache</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Transpiler</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">identifier</span> <span class="ow">in</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">cache</span><span class="p">[</span><span class="n">identifier</span><span class="p">]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__new__</span><span class="p">(</span><span class="bp">cls</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Placeholder.__init__"><a class="viewcode-back" href="../../core.html#tlang.core.Placeholder.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">identifier</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">identifier</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
