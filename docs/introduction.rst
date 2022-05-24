@@ -228,10 +228,10 @@ introduced with the division operator.
     print(list(statement(Map({"": "from table select *"}))))
 
 PEG style alterations, however, cannot handle left recursion. `Anltr
- <https://www.antlr.org/>`_ however recently proposed a `greedy version
- <https://www.antlr.org/papers/allstar-techreport.pdf>`_ of Tlang's default
- Alteration. These are implemented with the `//` operator in Tlang and make it
- straightforward to transition from g4 grammar files.
+<https://www.antlr.org/>`_ however recently proposed a `greedy version
+<https://www.antlr.org/papers/allstar-techreport.pdf>`_ of Tlang's default
+Alteration. These are implemented with the `//` operator in Tlang and make it
+straightforward to transition from g4 grammar files.
 
  
 ********************
