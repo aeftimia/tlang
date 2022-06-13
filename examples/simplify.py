@@ -3,11 +3,9 @@ import sys
 import random
 
 sys.path.append(".")
-import arithmetic  # noqa: E402
 
 
 class SampledAlteration(tlang.Combinator):
-
     def __init__(self, parsers, model):
         super().__init__(parsers, model)
         self.model = model
@@ -27,20 +25,28 @@ def resample(sampler):
 
 
 def sample(model, alterations={tlang.Alteration, tlang.PEGAlteration}):
-
     def alt_to_model(transpiler):
         return tlang.decache(
             transpiler.recur(
                 tlang.typed(
-                    {alt: lambda x: SampledAlteration((x.left, x.right), model())
-                     for alt in alterations})))
+                    {
+                        alt: lambda x: SampledAlteration((x.left, x.right), model())
+                        for alt in alterations
+                    }
+                )
+            )
+        )
+
     return alt_to_model
+
 
 def make_random_model(threshold=0.25):
     def random_model(context):
         i = random.uniform(0, 1) > threshold
         return i, context
+
     return random_model
+
 
 random.seed(0)
 
@@ -53,4 +59,3 @@ expression = expression.recurrence("expression")
 samples = resample(sample(make_random_model)(expression))
 for _ in range(40):
     print(next(samples))
-
