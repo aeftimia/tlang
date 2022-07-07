@@ -1,6 +1,7 @@
 import tlang
 import sys
 import random
+import jax
 
 sys.path.append(".")
 
@@ -48,9 +49,31 @@ def make_random_model(threshold=0.25):
     return random_model
 
 
+class IntelligentModel:
+    def __init__(self):
+        self.history = [set(), set()]
+
+    def __call__(self, context):
+        meta = context[self.__class__]
+        states, p = self.nn(meta["state"])
+        if meta["train"]:
+            i = meta["target"].pop()
+        else:
+            i = random.uniform(0, 1) < p
+        state = states[i]
+        context = tlang.set_scoped(context, (self.__class__, "state"), state)
+        loss = i * p + (1 - i) * (1 - p)
+        loss = jax.numpy.log(loss)
+        loss += tlang.get_scoped(context, (self.__class__, "loss"))
+        context = tlang.set_scoped(context, (self.__class__, "loss"), loss)
+        depth = tlang.get_scoped(context, (self.__class__, "depth"))
+        context = tlang.set_scoped(context, (self.__class__, "depth"), depth + 1)
+        return i, context
+
+
 random.seed(0)
 
-digits = "0" | "1" + tlang.repetition(tlang.oneof("01"))
+digits = "0" | "1" + tlang.greedy(tlang.oneof("01"))
 expression = digits | "(" + tlang.Placeholder("expression") + ")"
 expression |= expression + " * " + expression
 expression |= expression + " + " + expression
