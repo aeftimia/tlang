@@ -36,9 +36,7 @@ def create_lookup(context):
     yield context.set("lookup", lookup)
 
 
-@tlang.contextfree
-def strip(tokens):
-    yield tokens.strip(), ""
+strip = tlang.transform(lambda t: t.strip())
 
 
 newline = tlang.Terminal("\n")
@@ -51,6 +49,13 @@ remove_whitespaces = whitespaces.T("")
 quote = tlang.Terminal("'")
 escape = tlang.Terminal("\\")
 quoted = quote + tlang.pgreedy((escape / -quote) + tlang.wild) + quote
+
+
+@tlang.transform
+def escape_quote(s):
+    return s.replace('"', r"\"")
+
+
 quoted = quoted.T("tlang.Terminal({})")
 start_comment = tlang.Terminal("/*")
 end_comment = tlang.Terminal("*/")
@@ -87,7 +92,9 @@ def to_alteration(rule):
 
 hexcode = tlang.digit | tlang.oneof("ABCDEF")
 unicode = r"\u" + hexcode + hexcode + hexcode + hexcode
-characters = (unicode / (escape / -bracket) + tlang.wild).T('tlang.Terminal("{}")')
+characters = (unicode / (escape / -bracket) + tlang.wild) * escape_quote.T(
+    'tlang.Terminal("{}")'
+)
 somerange = charrange / digitrange
 somerange *= fmt_char_range
 charset = "[" + to_alteration(somerange / characters).ref("rule") + bracket
@@ -207,5 +214,5 @@ with open(os.path.join(here, "c.g4"), "r") as f:
 
 out = list(transpiler.run(antlr))
 assert len(out) == 1
-with open(os.path.join(here, "sqlite.py"), "w") as f:
+with open(os.path.join(here, "c.py"), "w") as f:
     f.write(out[0])

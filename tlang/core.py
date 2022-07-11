@@ -1025,6 +1025,16 @@ def contextfree(parser):
     return wrapper
 
 
+def transform(f):
+    """Simple contextfree transform"""
+
+    @contextfree
+    def _(tokens):
+        yield f(tokens), ""
+
+    return _
+
+
 def contextonly(read_context=frozenset([""])):
     """Create a transpiler that manipulates context while returning an empty
     output string.
